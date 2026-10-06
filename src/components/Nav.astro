@@ -1,0 +1,36 @@
+---
+const links = [
+	{ href: '/', label: 'Home' },
+	{ href: '/contact', label: 'Contact' },
+];
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-40 border-b border-text/10 bg-canvas/90 backdrop-blur">
+	<div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+		<a
+			href="/"
+			class="font-display text-lg font-semibold tracking-tight text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-sm"
+		>
+			Anirban Dam
+		</a>
+
+		<nav aria-label="Primary">
+			<ul class="flex items-center gap-2">
+				{
+					links.map((link) => (
+						<li>
+							<a
+								href={link.href}
+								aria-current={currentPath === link.href ? 'page' : undefined}
+								class="inline-block rounded-full px-4 py-2.5 text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+							>
+								{link.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</div>
+</header>

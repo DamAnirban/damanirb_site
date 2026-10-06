@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand palette — role-based, contrast-checked against each background it
+     actually sits on (see conversation for the full matrix):
+       text/canvas 11.7:1, text/blush 9.8:1, primary/canvas 6.3:1,
+       canvas/primary 6.3:1, text/coral 4.7:1 — all pass AA.
+     Secondary (1.9:1) and coral (2.5:1) fall under 3:1 against canvas, so
+     they're used decoratively only (borders, rings, icons) — never as text
+     on a light fill. */
+  --color-canvas: #faefed; /* Background — warm ivory, dominant fill */
+  --color-primary: #006078; /* Primary — deep teal, CTAs & brand accents */
+  --color-secondary: #82bac4; /* Secondary — muted cyan, borders & accents */
+  --color-blush: #ffd4d1; /* Soft accent — card & panel fills */
+  --color-coral: #e37c78; /* Highlight — eyebrows, hover, sparing use */
+  --color-text: #19343a; /* Text/Ink — deep charcoal, all copy */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-text);
+    font-family: var(--font-body);
+  }
+
+  a,
+  button {
+    touch-action: manipulation;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
