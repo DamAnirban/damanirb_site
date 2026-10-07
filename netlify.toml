@@ -4,3 +4,20 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Content-hashed filenames (Vite/Astro) never change without a new hash,
+# so these can be cached forever.
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/favicon.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

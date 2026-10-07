@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import portrait from '../assets/images/anirban-dam-hero.png';
 import purposeImage from '../assets/images/building-with-purpose.jpg';
@@ -71,8 +71,9 @@ const steps = [
 		</div>
 
 		<div class="relative shrink-0">
-			<Image
+			<Picture
 				src={portrait}
+				formats={['avif', 'webp']}
 				alt="Portrait of Anirban Dam smiling, wearing a navy blazer over a white t-shirt"
 				width={460}
 				height={452}
@@ -118,8 +119,9 @@ const steps = [
 			</div>
 
 			<div class="shrink-0">
-				<Image
+				<Picture
 					src={purposeImage}
+					formats={['avif', 'webp']}
 					alt="Laptop open on a wooden desk by a large window, overlooking a brick building"
 					width={400}
 					height={500}

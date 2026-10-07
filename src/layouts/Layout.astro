@@ -2,6 +2,8 @@
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import interLatinUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import spaceGroteskLatinUrl from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 
 interface Props {
 	title: string;
@@ -22,6 +24,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content="#FAEFED" />
 		<link rel="canonical" href={canonicalURL} />
+		<link rel="preload" href={interLatinUrl} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={spaceGroteskLatinUrl} as="font" type="font/woff2" crossorigin />
 
 		<title>{title}</title>
 		<meta name="description" content={description} />
