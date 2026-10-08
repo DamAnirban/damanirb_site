@@ -1,17 +1,43 @@
 ---
 const year = new Date().getUTCFullYear();
+
+const links = [
+	{ href: '/about', label: 'About' },
+	{ href: '/contact', label: 'Contact' },
+	{ href: '/privacy-policy', label: 'Privacy Policy' },
+	{ href: '/terms', label: 'Terms & Conditions' },
+];
 ---
 
 <footer class="border-t border-text/10">
-	<div class="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-10 text-center sm:flex-row sm:justify-between sm:text-left">
-		<p class="text-sm text-text/70">&copy; {year} Anirban Dam.</p>
-		<a
-			href="https://www.linkedin.com/in/anirban-dam/"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-sm font-medium text-text underline decoration-coral decoration-2 underline-offset-4 transition-colors hover:text-coral focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-sm"
-		>
-			Connect on LinkedIn
-		</a>
+	<div class="mx-auto max-w-5xl px-6 py-10">
+		<nav aria-label="Footer">
+			<ul class="flex flex-wrap justify-center gap-x-8 gap-y-2 text-center sm:justify-start">
+				{
+					links.map((link) => (
+						<li>
+							<a
+								href={link.href}
+								class="text-sm font-medium text-text/70 transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-sm"
+							>
+								{link.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<div class="mt-6 flex flex-col items-center gap-4 border-t border-text/10 pt-6 text-center sm:flex-row sm:justify-between sm:text-left">
+			<p class="text-sm text-text/70">&copy; {year} Anirban Dam.</p>
+			<a
+				href="https://www.linkedin.com/in/anirban-dam/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-sm font-medium text-text underline decoration-coral decoration-2 underline-offset-4 transition-colors hover:text-coral focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-sm"
+			>
+				Connect on LinkedIn
+			</a>
+		</div>
 	</div>
 </footer>
