@@ -1,0 +1,45 @@
+---
+// Decorative PCB-style traces. Colour comes from `currentColor`, so set it
+// with a text-* class on the component.
+interface Props {
+	class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+	class={className}
+	viewBox="0 0 400 300"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="1.5"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+	focusable="false"
+>
+	<path d="M0 40h90l30 30h80l20-20h60" />
+	<path d="M0 110h50l25 25h105l35 35h90" />
+	<path d="M120 0v40l20 20v60" />
+	<path d="M250 0v30l-30 30" />
+	<path d="M0 220h70l30-30h60" />
+	<path d="M180 300v-50l30-30h70l30-30h90" />
+	<path d="M330 300v-40l20-20h50" />
+	<path d="M400 80h-50l-20 20v50" />
+	<g fill="currentColor" stroke="none">
+		<circle cx="280" cy="50" r="4" />
+		<circle cx="305" cy="170" r="4" />
+		<circle cx="140" cy="120" r="4" />
+		<circle cx="160" cy="190" r="4" />
+		<circle cx="220" cy="60" r="4" />
+		<circle cx="330" cy="150" r="4" />
+		<circle cx="400" cy="190" r="4" />
+	</g>
+	<g stroke-width="1.5">
+		<circle cx="90" cy="40" r="6" />
+		<circle cx="50" cy="110" r="6" />
+		<circle cx="70" cy="220" r="6" />
+		<circle cx="350" cy="240" r="6" />
+	</g>
+</svg>
