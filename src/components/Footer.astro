@@ -9,8 +9,12 @@ const links = [
 ];
 ---
 
-<footer class="border-t border-text/10">
-	<div class="mx-auto max-w-5xl px-6 py-10">
+<footer class="relative">
+	<div aria-hidden="true" class="h-px bg-linear-to-r from-transparent via-secondary to-transparent"></div>
+	<div class="mx-auto max-w-5xl px-6 py-12">
+		<p class="mb-8 text-center font-display text-lg font-semibold text-text sm:text-left">
+			Learn deeply<span class="text-coral" aria-hidden="true"> · </span><span class="sr-only">, </span>simplify clearly<span class="text-coral" aria-hidden="true"> · </span><span class="sr-only">, </span>share generously
+		</p>
 		<nav aria-label="Footer">
 			<ul class="flex flex-wrap justify-center gap-x-8 gap-y-2 text-center sm:justify-start">
 				{

@@ -3,15 +3,21 @@ const links = [
 	{ href: '/', label: 'Home' },
 	{ href: '/contact', label: 'Contact' },
 ];
-const currentPath = Astro.url.pathname;
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
-<header class="sticky top-0 z-40 border-b border-text/10 bg-canvas/90 backdrop-blur">
+<header class="sticky top-0 z-40 border-b border-text/10 bg-canvas/75 backdrop-blur-md">
 	<div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
 		<a
 			href="/"
-			class="font-display text-lg font-semibold tracking-tight text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-sm"
+			class="group flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas rounded-full"
 		>
+			<span
+				aria-hidden="true"
+				class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-sm font-bold text-canvas shadow-sm ring-2 ring-coral/40 ring-offset-2 ring-offset-canvas transition-transform duration-300 group-hover:-rotate-6"
+			>
+				AD
+			</span>
 			Anirban Dam
 		</a>
 
@@ -23,7 +29,7 @@ const currentPath = Astro.url.pathname;
 							<a
 								href={link.href}
 								aria-current={currentPath === link.href ? 'page' : undefined}
-								class="inline-block rounded-full px-4 py-2.5 text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+								class="inline-block rounded-full px-4 py-2.5 text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 							>
 								{link.label}
 							</a>

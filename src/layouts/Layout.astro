@@ -27,6 +27,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="preload" href={interLatinUrl} as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href={spaceGroteskLatinUrl} as="font" type="font/woff2" crossorigin />
 
+		<script is:inline>document.documentElement.classList.add('js');</script>
+
 		<title>{title}</title>
 		<meta name="description" content={description} />
 
@@ -47,9 +49,31 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 			Skip to content
 		</a>
 		<Nav />
-		<main id="main">
+		<main id="main" class="relative isolate overflow-x-clip">
+			<!-- Page-top atmosphere shared by every page -->
+			<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[42rem]">
+				<div class="bg-dots mask-fade-b absolute inset-0 opacity-70"></div>
+				<div class="absolute -top-32 -right-24 h-[28rem] w-[28rem] rounded-full bg-blush blur-3xl"></div>
+				<div class="absolute top-40 -left-40 h-[24rem] w-[24rem] rounded-full bg-secondary/30 blur-3xl"></div>
+			</div>
 			<slot />
 		</main>
 		<Footer />
+
+		<script>
+			const targets = document.querySelectorAll('[data-reveal]');
+			const observer = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('is-visible');
+							observer.unobserve(entry.target);
+						}
+					}
+				},
+				{ rootMargin: '0px 0px -10% 0px' },
+			);
+			targets.forEach((el) => observer.observe(el));
+		</script>
 	</body>
 </html>

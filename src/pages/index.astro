@@ -1,6 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
+import CircuitTraces from '../components/CircuitTraces.astro';
 import portrait from '../assets/images/anirban-dam-hero.png';
 import purposeImage from '../assets/images/building-with-purpose.jpg';
 
@@ -36,6 +37,8 @@ const steps = [
 		body: 'Write. Blog. Explain. Save for later or push it out to the world — either way, it’s another brick in the wall.',
 	},
 ];
+
+const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 ---
 
 <Layout
@@ -43,34 +46,60 @@ const steps = [
 	description="Anirban Dam is a VLSI & Emulation Engineer and robotics hobbyist who designs hardware flows, automates chip design methodology, and shares what he learns across code, circuits, and content."
 >
 	<!-- Hero -->
-	<section class="bg-canvas mx-auto flex max-w-5xl flex-col-reverse items-center gap-12 px-6 py-16 sm:py-24 lg:flex-row lg:gap-16">
+	<section class="mx-auto flex max-w-5xl flex-col-reverse items-center gap-12 px-6 pt-12 pb-20 sm:pt-20 sm:pb-28 lg:flex-row lg:gap-16">
 		<div class="flex-1 text-center lg:text-left">
-			<p class="font-display text-sm font-semibold uppercase tracking-[0.2em] text-coral">Hi, I’m</p>
-			<h1 class="mt-3 text-balance font-display text-4xl font-semibold tracking-tight text-text sm:text-5xl lg:text-6xl">
-				Anirban Dam.
+			<p class="inline-flex items-center gap-2 rounded-full border border-secondary/60 bg-canvas/70 py-1.5 pr-4 pl-2 text-sm font-medium text-text/80 shadow-sm backdrop-blur">
+				<span class="relative flex h-2.5 w-2.5" aria-hidden="true">
+					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-coral opacity-60"></span>
+					<span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-coral"></span>
+				</span>
+				Hi, I’m
+			</p>
+			<h1 class="mt-5 text-balance font-display text-5xl font-bold tracking-tight text-text sm:text-6xl lg:text-7xl">
+				Anirban<br class="hidden lg:block" /> Dam<span class="text-coral">.</span>
 			</h1>
-			<p class="mx-auto mt-6 max-w-xl text-justify text-lg leading-relaxed text-text/80 lg:mx-0">
+			<ul class="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start" aria-label="Focus areas">
+				{
+					focusAreas.map((area) => (
+						<li class="rounded-lg border border-text/10 bg-blush/60 px-3 py-1 font-display text-xs font-semibold tracking-[0.15em] text-primary uppercase">
+							{area}
+						</li>
+					))
+				}
+			</ul>
+			<p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-text/80 lg:mx-0">
 				A VLSI &amp; Emulation Engineer by profession and robotics hobbyist by passion. I design
 				hardware flows, automate chip design methodology, and share what I learn across code,
 				circuits, and content.
 			</p>
-			<div class="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+			<div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
 				<a
 					href="#work"
-					class="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-canvas shadow-sm transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+					class="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-canvas shadow-lg shadow-primary/25 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 				>
 					See How I Work
+					<span aria-hidden="true" class="transition-transform group-hover:translate-y-0.5">↓</span>
 				</a>
 				<a
 					href="/contact"
-					class="rounded-full border-2 border-text/20 px-6 py-3 text-sm font-semibold text-text transition-colors hover:border-text/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+					class="group inline-flex items-center gap-2 rounded-full border-2 border-text/20 bg-canvas/60 px-6 py-3 text-sm font-semibold text-text backdrop-blur transition-colors hover:border-primary hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 				>
 					Get in Touch
+					<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
 				</a>
 			</div>
 		</div>
 
 		<div class="relative shrink-0">
+			<!-- Decoration behind the portrait -->
+			<div aria-hidden="true" class="pointer-events-none absolute inset-0">
+				<div class="absolute inset-6 rounded-full bg-linear-to-br from-secondary/40 via-blush/70 to-coral/25 blur-2xl"></div>
+				<svg class="animate-spin-slow absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)] text-primary/30" viewBox="0 0 100 100" fill="none">
+					<circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="0.4" stroke-dasharray="1 3" />
+					<circle cx="50" cy="2" r="1.4" class="fill-coral" />
+					<circle cx="2" cy="50" r="1" class="fill-primary" />
+				</svg>
+			</div>
 			<Picture
 				src={portrait}
 				formats={['avif', 'webp']}
@@ -79,19 +108,36 @@ const steps = [
 				height={452}
 				loading="eager"
 				fetchpriority="high"
-				class="w-72 sm:w-80 lg:w-96"
+				class="relative w-72 mix-blend-multiply [mask-image:radial-gradient(ellipse_farthest-corner,black_72%,transparent_92%)] sm:w-80 lg:w-96"
 			/>
+			<div
+				aria-hidden="true"
+				class="animate-float absolute -bottom-2 -left-4 flex items-center gap-2 rounded-2xl border border-text/10 bg-canvas/90 px-4 py-2.5 text-sm font-semibold text-text shadow-lg backdrop-blur sm:-left-10"
+			>
+				<span class="text-lg">🔬</span> Silicon by day
+			</div>
+			<div
+				aria-hidden="true"
+				class="animate-float absolute top-6 -right-2 flex items-center gap-2 rounded-2xl border border-text/10 bg-canvas/90 px-4 py-2.5 text-sm font-semibold text-text shadow-lg backdrop-blur [animation-delay:-3.5s] sm:-right-8"
+			>
+				<span class="text-lg">🤖</span> Robots by night
+			</div>
 		</div>
 	</section>
 
 	<!-- Building with Purpose -->
-	<section class="bg-secondary/30">
-		<div class="mx-auto flex max-w-5xl flex-col items-center gap-12 px-6 py-16 sm:py-24 lg:flex-row lg:gap-16">
-			<div class="flex-1 text-left">
-				<h2 class="text-balance font-display text-3xl font-semibold tracking-tight text-text sm:text-4xl">
+	<section class="relative overflow-hidden bg-linear-to-br from-secondary/35 via-secondary/20 to-blush/50">
+		<CircuitTraces class="pointer-events-none absolute -top-10 -right-20 w-[34rem] text-primary/10" />
+		<div class="relative mx-auto flex max-w-5xl flex-col items-center gap-14 px-6 py-20 sm:py-28 lg:flex-row lg:gap-16">
+			<div class="flex-1" data-reveal>
+				<p class="flex items-center gap-3 font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase">
+					<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true"></span>
+					The idea
+				</p>
+				<h2 class="mt-3 text-balance font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
 					Building with Purpose
 				</h2>
-				<div class="mt-6 grid gap-x-10 gap-y-5 text-justify text-lg leading-relaxed text-text/80 hyphens-auto lg:grid-cols-2">
+				<div class="mt-8 grid gap-x-10 gap-y-5 text-lg leading-relaxed text-text/80 lg:grid-cols-2">
 					<div class="space-y-5">
 						<p>
 							Most breakthroughs don’t happen in perfect tutorials, they happen in messy
@@ -107,8 +153,10 @@ const steps = [
 					<div class="space-y-5">
 						<p>
 							Whether I am automating chip design flows, building robotics projects, or deep
-							diving into tools — I try to follow this: <span class="font-semibold text-primary">Learn
-							deeply, simplify clearly and share generously.</span>
+							diving into tools — I try to follow this:
+						</p>
+						<p class="rounded-2xl border-l-4 border-coral bg-canvas/70 px-5 py-4 font-display text-xl font-semibold text-primary shadow-sm">
+							Learn deeply, simplify clearly and share generously.
 						</p>
 						<p>
 							If you are someone who builds, explores, or just thinks out loud — you might find
@@ -118,7 +166,9 @@ const steps = [
 				</div>
 			</div>
 
-			<div class="shrink-0">
+			<div class="relative shrink-0" data-reveal style="--reveal-delay: 150ms">
+				<div aria-hidden="true" class="absolute inset-0 translate-x-4 translate-y-4 rounded-3xl border-2 border-coral"></div>
+				<div aria-hidden="true" class="bg-dots absolute -top-6 -left-6 h-28 w-28 rounded-2xl"></div>
 				<Picture
 					src={purposeImage}
 					formats={['avif', 'webp']}
@@ -126,32 +176,47 @@ const steps = [
 					width={400}
 					height={500}
 					loading="lazy"
-					class="w-56 rounded-3xl shadow-sm sm:w-72 lg:w-80"
+					class="relative w-56 rounded-3xl shadow-xl sm:w-72 lg:w-80"
 				/>
 			</div>
 		</div>
 	</section>
 
 	<!-- Working Process -->
-	<section id="work" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-16 sm:py-24">
-		<h2 class="text-balance font-display text-3xl font-semibold tracking-tight text-text sm:text-4xl">
-			Working Process
-		</h2>
-		<ol class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+	<section id="work" class="mx-auto max-w-5xl scroll-mt-20 px-6 py-20 sm:py-28">
+		<div data-reveal>
+			<p class="flex items-center gap-3 font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase">
+				<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true"></span>
+				How I work
+			</p>
+			<h2 class="mt-3 text-balance font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+				Working Process
+			</h2>
+		</div>
+		<ol class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{
 				steps.map((step, i) => (
-					<li class="relative rounded-2xl border border-secondary/40 bg-blush/30 p-6 shadow-sm">
-						<span
-							class="absolute -top-3 -left-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-canvas ring-4 ring-secondary/40"
-							aria-hidden="true"
-						>
-							{i + 1}
-						</span>
-						<span class="text-3xl" aria-hidden="true">
-							{step.emoji}
-						</span>
-						<h3 class="mt-3 font-display text-lg font-semibold text-text">{step.title}</h3>
-						<p class="mt-2 text-sm leading-relaxed text-text/70">{step.body}</p>
+					<li data-reveal style={`--reveal-delay: ${(i % 3) * 100}ms`}>
+						<div class="group relative h-full overflow-hidden rounded-2xl border border-text/10 bg-canvas/80 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-xl hover:shadow-primary/10">
+							<span
+								class="pointer-events-none absolute -top-4 right-3 font-display text-8xl font-bold text-secondary/25 transition-colors duration-300 select-none group-hover:text-coral/25"
+								aria-hidden="true"
+							>
+								{String(i + 1).padStart(2, '0')}
+							</span>
+							<span
+								class="relative flex h-12 w-12 items-center justify-center rounded-xl bg-blush text-2xl ring-1 ring-coral/30 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+								aria-hidden="true"
+							>
+								{step.emoji}
+							</span>
+							<h3 class="relative mt-5 font-display text-lg font-semibold text-text">{step.title}</h3>
+							<p class="relative mt-2 text-sm leading-relaxed text-text/70">{step.body}</p>
+							<span
+								class="absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-linear-to-r from-primary via-secondary to-coral transition-transform duration-500 group-hover:scale-x-100"
+								aria-hidden="true"
+							/>
+						</div>
 					</li>
 				))
 			}
@@ -159,20 +224,26 @@ const steps = [
 	</section>
 
 	<!-- Stay In Touch -->
-	<section class="bg-primary">
-		<div class="mx-auto max-w-3xl px-6 py-16 text-center sm:py-20">
-			<h2 class="text-balance font-display text-3xl font-semibold tracking-tight text-canvas sm:text-4xl">
-				Stay In Touch
-			</h2>
-			<p class="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-canvas/80">
-				Feel free to check out my contact page to stay in touch, Ciao!
-			</p>
-			<a
-				href="/contact"
-				class="mt-8 inline-block rounded-full bg-canvas px-6 py-3 text-sm font-semibold text-primary shadow-sm transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-canvas focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
-			>
-				Go to Contact
-			</a>
+	<section class="px-6 pb-20 sm:pb-28">
+		<div class="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-primary shadow-2xl shadow-primary/30" data-reveal>
+			<CircuitTraces class="pointer-events-none absolute -bottom-16 -left-16 w-[30rem] text-canvas/10" />
+			<CircuitTraces class="pointer-events-none absolute -top-20 -right-24 w-[30rem] rotate-180 text-canvas/10" />
+			<div aria-hidden="true" class="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-coral/40 blur-3xl"></div>
+			<div class="relative px-6 py-16 text-center sm:py-20">
+				<h2 class="text-balance font-display text-3xl font-bold tracking-tight text-canvas sm:text-5xl">
+					Stay In Touch
+				</h2>
+				<p class="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-canvas/85">
+					Feel free to check out my contact page to stay in touch, Ciao!
+				</p>
+				<a
+					href="/contact"
+					class="group mt-9 inline-flex items-center gap-2 rounded-full bg-canvas px-7 py-3.5 text-sm font-semibold text-primary shadow-lg transition hover:-translate-y-0.5 hover:bg-blush focus:outline-none focus-visible:ring-2 focus-visible:ring-canvas focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+				>
+					Go to Contact
+					<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+				</a>
+			</div>
 		</div>
 	</section>
 </Layout>
