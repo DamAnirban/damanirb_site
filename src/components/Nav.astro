@@ -1,9 +1,11 @@
 ---
-const links = [
-	{ href: '/', label: 'Home' },
-	{ href: '/contact', label: 'Contact' },
+// 'tools' marks where the Common Tools dropdown sits among the links.
+const navItems = [{ href: '/', label: 'Home' }, 'tools', { href: '/contact', label: 'Contact' }] as const;
+const tools = [
+	{ href: '/tools/work-week', label: 'Work Week', description: 'Full-year calendar with ww numbers' },
 ];
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const onToolPage = tools.some((tool) => tool.href === currentPath);
 ---
 
 <header class="sticky top-0 z-40 border-b border-text/10 bg-canvas/75 backdrop-blur-md">
@@ -18,25 +20,96 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 			>
 				AD
 			</span>
-			Anirban Dam
+			<span class="hidden sm:inline">Anirban Dam</span>
 		</a>
 
 		<nav aria-label="Primary">
 			<ul class="flex items-center gap-2">
 				{
-					links.map((link) => (
-						<li>
+					navItems.map((item) =>
+						// Not a link: opens on hover, or by toggling the button (tap, Enter/Space).
+						item === 'tools' ? (
+							<li class="group relative" data-dropdown>
+					<button
+						type="button"
+						aria-haspopup="true"
+						aria-expanded="false"
+						aria-controls="tools-menu"
+						data-active={onToolPage ? 'true' : undefined}
+						class="peer inline-flex cursor-default items-center gap-1 rounded-full px-3 py-2.5 text-sm font-medium text-text/80 transition-colors group-hover:bg-blush/60 group-hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-canvas sm:px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+					>
+						Common Tools
+						<svg class="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 peer-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
+						</svg>
+					</button>
+					<!-- pt-2 bridges the gap so the menu stays open while the pointer moves onto it -->
+					<div
+						id="tools-menu"
+						class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100"
+					>
+						<ul class="rounded-2xl border border-text/10 bg-canvas p-2 shadow-xl shadow-primary/10">
+							{
+								tools.map((tool) => (
+									<li>
+										<a
+											href={tool.href}
+											aria-current={currentPath === tool.href ? 'page' : undefined}
+											class="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-blush/60 aria-[current=page]:bg-blush focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+										>
+											<span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas" aria-hidden="true">
+												<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+													<rect x="3" y="4" width="18" height="18" rx="2" />
+													<path d="M16 2v4M8 2v4M3 10h18" />
+												</svg>
+											</span>
+											<span>
+												<span class="block text-sm font-semibold text-text">{tool.label}</span>
+												<span class="block text-xs text-text/70">{tool.description}</span>
+											</span>
+										</a>
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</li>
+						) : (
+							<li>
 							<a
-								href={link.href}
-								aria-current={currentPath === link.href ? 'page' : undefined}
-								class="inline-block rounded-full px-4 py-2.5 text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+								href={item.href}
+								aria-current={currentPath === item.href ? 'page' : undefined}
+								class="inline-block rounded-full px-3 py-2.5 sm:px-4 text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 							>
-								{link.label}
+								{item.label}
 							</a>
 						</li>
-					))
+						),
+					)
 				}
 			</ul>
 		</nav>
 	</div>
 </header>
+
+<script>
+	// Hover is handled in CSS; this adds tap/keyboard toggling for touch and keyboard users.
+	for (const dropdown of document.querySelectorAll<HTMLElement>('[data-dropdown]')) {
+		const button = dropdown.querySelector('button')!;
+		const setOpen = (open: boolean) => button.setAttribute('aria-expanded', String(open));
+
+		button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+		document.addEventListener('click', (event) => {
+			if (!dropdown.contains(event.target as Node)) setOpen(false);
+		});
+		dropdown.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				setOpen(false);
+				button.focus();
+			}
+		});
+		dropdown.addEventListener('focusout', (event) => {
+			if (!dropdown.contains(event.relatedTarget as Node | null)) setOpen(false);
+		});
+	}
+</script>

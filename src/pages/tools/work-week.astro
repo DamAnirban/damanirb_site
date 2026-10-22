@@ -1,0 +1,253 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { buildYear } from '../../lib/workWeek';
+
+// One slide per year; the arrows on the screen edges slide between them.
+const YEARS = [2026, 2027];
+const years = YEARS.map((year) => ({ year, months: buildYear(year) }));
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Every month gets 6 rows so cells are the same size across the whole year.
+const ROWS = 6;
+
+// Row/column template shared by the header row and every week row.
+const cols = 'grid grid-cols-[1.6rem_repeat(7,minmax(0,1fr))] 2xl:grid-cols-[2rem_repeat(7,minmax(0,1fr))]';
+---
+
+<Layout
+	title={`Work Week Calendar ${YEARS[0]}–${YEARS.at(-1)} — Anirban Dam`}
+	description={`Full-year ${YEARS.join(' and ')} calendars with work-week numbers and workday labels (ww.1 to ww.5) for every Monday to Friday.`}
+>
+	<!-- On desktop the section is exactly one viewport tall (minus the 73px nav) so the whole year fits without scrolling. -->
+	<section id="work-week" class="flex flex-col px-3 pt-3 pb-4 sm:px-4 lg:px-12 lg:h-[calc(100dvh-73px)] lg:min-h-[34rem]">
+		<header class="flex shrink-0 flex-wrap items-center justify-between gap-x-6 gap-y-2 pb-3">
+			<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+				<h1 class="font-display text-2xl font-bold tracking-tight text-text">
+					Work Week <span id="year-label" class="text-primary">{YEARS[0]}</span>
+				</h1>
+				<p class="text-xs text-text/70">
+					ww1 = week of Jan 1 · <span class="font-semibold text-text">ww.1</span> Mon to <span class="font-semibold text-text">ww.5</span> Fri
+				</p>
+			</div>
+
+			<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+				<ul class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-text/80" aria-label="Legend">
+					<li class="flex items-center gap-1.5">
+						<span class="h-3 w-3 rounded-sm bg-blush" aria-hidden="true"></span> Alternate weeks
+					</li>
+					<li class="flex items-center gap-1.5">
+						<span class="h-3 w-3 rounded-sm bg-secondary/40" aria-hidden="true"></span> Weekend
+					</li>
+					<li class="flex items-center gap-1.5">
+						<span class="h-3 w-3 rounded-sm bg-coral ring-2 ring-primary" aria-hidden="true"></span> Today
+					</li>
+				</ul>
+				<p
+					id="today-badge"
+					hidden
+					class="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-canvas shadow-lg shadow-primary/25"
+				>
+					<span class="relative flex h-2 w-2" aria-hidden="true">
+						<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-coral opacity-75"></span>
+						<span class="relative inline-flex h-2 w-2 rounded-full bg-coral"></span>
+					</span>
+					<span>Today is <span id="today-label"></span></span>
+				</p>
+			</div>
+		</header>
+
+		<!-- Slides sit side by side; the track is translated to show one year at a time. -->
+		<div class="relative min-h-0 flex-1 overflow-hidden">
+			<div id="year-track" class="flex items-start ease-[cubic-bezier(0.65,0,0.35,1)] lg:h-full lg:items-stretch">
+				{years.map(({ year, months }, index) => (
+					<div data-year={year} inert={index > 0} class="w-full shrink-0 lg:h-full">
+						<div
+							class="grid gap-2.5 p-1 lg:h-full sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-3 min-[2400px]:grid-cols-6 min-[2400px]:grid-rows-2"
+						>
+							{
+								months.map((month) => (
+									<article
+										data-month
+										role="table"
+										aria-label={`${month.name} ${year}`}
+										class="flex min-h-0 flex-col overflow-hidden rounded-xl border border-text/10 bg-canvas/85 shadow-sm backdrop-blur transition-shadow data-[current]:shadow-lg data-[current]:shadow-primary/20 data-[current]:ring-2 data-[current]:ring-coral"
+									>
+										<h2 class="shrink-0 bg-primary px-3 py-1 font-display text-sm font-semibold text-canvas 2xl:text-base">
+											{month.name}
+										</h2>
+										<div
+											role="row"
+											class:list={[cols, 'shrink-0 border-b border-text/10 text-[9px] font-semibold tracking-wide text-text/70 uppercase 2xl:text-[10px]']}
+										>
+											<span role="columnheader" class="py-0.5 text-center">WW</span>
+											{weekdays.map((name, i) => (
+												<span role="columnheader" class:list={['py-0.5 text-center', (i === 0 || i === 6) && 'bg-secondary/20']}>
+													{name}
+												</span>
+											))}
+										</div>
+										<div role="rowgroup" class="grid min-h-0 flex-1 lg:grid-rows-6">
+											{month.weeks.map((week) => (
+												<div
+													role="row"
+													data-ww={week.ww}
+													class:list={[
+														cols,
+														'min-h-9 border-b border-text/5 transition-colors lg:min-h-0',
+														week.ww % 2 === 1 && 'bg-blush/45',
+													]}
+												>
+													<span
+														role="rowheader"
+														class="flex items-center justify-center border-r border-text/10 font-display text-[10px] font-bold text-primary 2xl:text-xs"
+													>
+														{week.ww}
+													</span>
+													{week.days.map((day) => (
+														<span
+															role="cell"
+															data-date={day.iso}
+															class:list={[
+																'group flex min-w-0 flex-col items-center justify-center p-px',
+																day.isWeekend && 'bg-secondary/20',
+															]}
+														>
+															{day.day && (
+																<span class="flex h-full w-full flex-col items-center justify-center rounded-md leading-none transition group-data-[today]:z-10 group-data-[today]:scale-110 group-data-[today]:bg-coral group-data-[today]:shadow-md group-data-[today]:ring-2 group-data-[today]:ring-primary">
+																	<span
+																		class:list={[
+																			'text-[clamp(10px,1.45vh,14px)] font-semibold group-data-[today]:font-bold group-data-[today]:text-text',
+																			day.isWeekend ? 'text-text/60' : 'text-text',
+																		]}
+																	>
+																		{day.day}
+																	</span>
+																	{day.label && (
+																		<span class="mt-px text-[clamp(8px,1.05vh,11px)] font-medium tracking-tight text-primary/85 tabular-nums group-data-[today]:font-semibold group-data-[today]:text-text">
+																			{day.label}
+																		</span>
+																	)}
+																</span>
+															)}
+														</span>
+													))}
+												</div>
+											))}
+											{Array.from({ length: ROWS - month.weeks.length }, () => (
+												<div aria-hidden="true" class="hidden lg:block" />
+											))}
+										</div>
+									</article>
+								))
+							}
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+
+		<button
+			id="year-prev"
+			type="button"
+			hidden
+			class="group fixed top-1/2 left-0 z-30 flex -translate-y-1/2 flex-col items-center gap-1 rounded-r-2xl bg-primary py-4 pr-2 pl-1.5 text-canvas shadow-xl shadow-primary/30 transition-[padding] hover:pl-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+		>
+			<svg class="animate-nudge-l h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+				<path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.83 10l3.94 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02z" clip-rule="evenodd" />
+			</svg>
+			<span class="text-[11px] font-bold [writing-mode:vertical-rl] rotate-180" data-year-text></span>
+		</button>
+		<button
+			id="year-next"
+			type="button"
+			hidden
+			class="group fixed top-1/2 right-0 z-30 flex -translate-y-1/2 flex-col items-center gap-1 rounded-l-2xl bg-primary py-4 pr-1.5 pl-2 text-canvas shadow-xl shadow-primary/30 transition-[padding] hover:pr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+		>
+			<svg class="animate-nudge-r h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+				<path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.17 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02z" clip-rule="evenodd" />
+			</svg>
+			<span class="text-[11px] font-bold [writing-mode:vertical-rl]" data-year-text></span>
+		</button>
+	</section>
+</Layout>
+
+<script>
+	const track = document.getElementById('year-track')!;
+	const slides = [...track.children] as HTMLElement[];
+	const prevButton = document.getElementById('year-prev')!;
+	const nextButton = document.getElementById('year-next')!;
+	const yearLabel = document.getElementById('year-label')!;
+	let current = 0;
+
+	function showYear(index: number) {
+		current = Math.max(0, Math.min(index, slides.length - 1));
+		track.style.transform = `translateX(-${current * 100}%)`;
+		// Off-screen years are inert so they can't be tabbed into or read out.
+		slides.forEach((slide, i) => (slide.inert = i !== current));
+		yearLabel.textContent = slides[current].dataset.year!;
+
+		const prevYear = slides[current - 1]?.dataset.year;
+		const nextYear = slides[current + 1]?.dataset.year;
+		prevButton.hidden = !prevYear;
+		nextButton.hidden = !nextYear;
+		if (prevYear) {
+			prevButton.querySelector('[data-year-text]')!.textContent = prevYear;
+			prevButton.setAttribute('aria-label', `Show ${prevYear}`);
+		}
+		if (nextYear) {
+			nextButton.querySelector('[data-year-text]')!.textContent = nextYear;
+			nextButton.setAttribute('aria-label', `Show ${nextYear}`);
+		}
+	}
+
+	function slideTo(index: number) {
+		if (index < 0 || index >= slides.length || index === current) return;
+		showYear(index);
+		// On phones the calendar is taller than the screen; bring the new year's top into view.
+		const section = document.getElementById('work-week')!;
+		if (section.getBoundingClientRect().top < 0) section.scrollIntoView({ behavior: 'smooth' });
+	}
+
+	prevButton.addEventListener('click', () => slideTo(current - 1));
+	nextButton.addEventListener('click', () => slideTo(current + 1));
+	document.addEventListener('keydown', (event) => {
+		if (event.altKey || event.ctrlKey || event.metaKey) return;
+		if (event.key === 'ArrowRight') slideTo(current + 1);
+		if (event.key === 'ArrowLeft') slideTo(current - 1);
+	});
+
+	// Highlight today in the viewer's local timezone (the page is static).
+	const now = new Date();
+	const pad = (n: number) => String(n).padStart(2, '0');
+	const todayIso = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+	const todayCell = document.querySelector<HTMLElement>(`[data-date="${todayIso}"]`);
+	if (todayCell) {
+		todayCell.dataset.today = '';
+		todayCell.setAttribute('aria-current', 'date');
+		const row = todayCell.closest<HTMLElement>('[data-ww]')!;
+		row.classList.add('!bg-coral/25');
+		todayCell.closest<HTMLElement>('[data-month]')!.dataset.current = '';
+
+		const label = todayCell.querySelector('.tabular-nums')?.textContent ?? `ww${row.dataset.ww} (weekend)`;
+		const date = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+		document.getElementById('today-label')!.textContent = `${label} · ${date}`;
+		document.getElementById('today-badge')!.hidden = false;
+	}
+
+	// Open on the year containing today, without animating, then enable the slide transition.
+	showYear(Math.max(0, slides.findIndex((slide) => slide.contains(todayCell))));
+	requestAnimationFrame(() => track.classList.add('transition-transform', 'duration-500'));
+
+	// A week can be split across two month cards; hovering one row lights up both halves.
+	for (const row of document.querySelectorAll<HTMLElement>('[data-ww]')) {
+		const toggle = (on: boolean) => {
+			const year = row.closest('[data-year]')!;
+			for (const match of year.querySelectorAll(`[data-ww="${row.dataset.ww}"]`)) {
+				match.classList.toggle('outline-2', on);
+				match.classList.toggle('-outline-offset-2', on);
+				match.classList.toggle('outline-secondary', on);
+			}
+		};
+		row.addEventListener('mouseenter', () => toggle(true));
+		row.addEventListener('mouseleave', () => toggle(false));
+	}
+</script>
