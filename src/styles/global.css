@@ -24,6 +24,28 @@
   --animate-float: float 7s ease-in-out infinite;
   --animate-spin-slow: spin 40s linear infinite;
   --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
+  --animate-nudge-r: nudge-r 1.8s ease-in-out infinite;
+  --animate-nudge-l: nudge-l 1.8s ease-in-out infinite;
+
+  @keyframes nudge-r {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(3px);
+    }
+  }
+
+  @keyframes nudge-l {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(-3px);
+    }
+  }
 
   @keyframes float {
     0%,
