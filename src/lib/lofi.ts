@@ -166,6 +166,7 @@ export class LofiPlayer {
 	private ctx: AudioContext;
 	private output: GainNode; // volume
 	private fader: GainNode; // start/stop fades
+	private ducker: GainNode; // dips the music under other sounds, e.g. the timer chime
 	private music: GainNode; // everything that goes through the "lofi" filter
 	private toneFilter: BiquadFilterNode;
 	private crackleBus: GainNode;
@@ -194,7 +195,8 @@ export class LofiPlayer {
 		this.output.gain.value = 0.7;
 		this.fader = ctx.createGain();
 		this.fader.gain.value = 0;
-		this.fader.connect(this.output).connect(ctx.destination);
+		this.ducker = ctx.createGain();
+		this.fader.connect(this.ducker).connect(this.output).connect(ctx.destination);
 
 		// Warm, dull top end and gentle glue are most of the "lofi" sound.
 		this.toneFilter = ctx.createBiquadFilter();
@@ -239,6 +241,14 @@ export class LofiPlayer {
 			return;
 		}
 		this.pendingVibe = VIBES[id];
+	}
+
+	/** Lower the music for `seconds` (e.g. while a chime rings), then ease it back. */
+	duck(seconds: number, level = 0.25) {
+		const now = this.ctx.currentTime;
+		this.ducker.gain.cancelScheduledValues(now);
+		this.ducker.gain.setTargetAtTime(level, now, 0.08);
+		this.ducker.gain.setTargetAtTime(1, now + seconds, 0.6);
 	}
 
 	setCrackle(on: boolean) {
