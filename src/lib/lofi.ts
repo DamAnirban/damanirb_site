@@ -1,56 +1,164 @@
-// A small lofi-beat generator built on Web Audio: jazzy electric-piano chords,
-// bass, a swung boom-bap kit, the odd melody note, vinyl crackle and optional
-// rain. Everything is synthesised live, so there are no audio files or
-// third-party requests. Notes are scheduled slightly ahead on the audio clock
-// (the "lookahead" pattern) so timing stays tight even if the main thread stalls.
+// A small lofi-beat generator built on Web Audio: electric-piano chords, bass,
+// drums, the odd melody note, vinyl crackle and optional rain. Everything is
+// synthesised live, so there are no audio files or third-party requests.
+//
+// Notes are scheduled ahead on the audio clock (the "lookahead" pattern) from a
+// main-thread timer. The lookahead is generous so ordinary main-thread pauses
+// (GC, layout, busy tabs) don't make notes late, and if the timer ever does
+// fall behind, the sequencer skips forward instead of cramming late notes in.
 
 export type VibeId = 'night' | 'coffee' | 'rainy';
+
+interface Chord {
+	bass: number; // MIDI root
+	keys: number[]; // MIDI voicing
+}
+
+/** A keys hit: on `step`, with `chance`, `upper` plays only the top notes, `length` is in bars. */
+interface KeysHit {
+	step: number;
+	chance: number;
+	upper?: boolean;
+	length: number;
+	velocity: number;
+}
+
+/** A bass note: on `step`, with `chance`, `interval` semitones above the root, `length` in bars. */
+interface BassHit {
+	step: number;
+	chance: number;
+	interval: number;
+	length: number;
+}
 
 interface Vibe {
 	label: string;
 	bpm: number;
-	/** One chord per bar: bass root plus electric-piano voicing, as MIDI notes. */
-	chords: { bass: number; keys: number[] }[];
+	swing: number; // how late off-beat 8ths land, as a fraction of a 16th
+	tone: number; // lowpass cutoff in Hz: lower = darker, more muffled
+	keys: {
+		partials: [ratio: number, level: number][]; // more/louder upper partials = brighter
+		attack: number; // seconds; slow attacks turn the piano into a soft pad
+		hits: KeysHit[];
+	};
+	bass: BassHit[];
+	drums: {
+		kick: number[];
+		ghostKick: number[]; // played 35% of the time
+		snare: number[];
+		snareStyle: 'snare' | 'rim';
+		hats: number[];
+		hatLevel: number;
+	};
+	melodyChance: number;
+	chords: Chord[];
 }
 
 export const VIBES: Record<VibeId, Vibe> = {
-	// ii-V-I-vi in C: Dm9, G13, Cmaj9, Am9
+	// Classic boom-bap: jazzy ii-V-I in C, warm keys, lazy swing.
 	night: {
 		label: 'Late night',
-		bpm: 72,
+		bpm: 74,
+		swing: 0.3,
+		tone: 2300,
+		keys: {
+			partials: [
+				[1, 1],
+				[2, 0.18],
+				[3.01, 0.05],
+			],
+			attack: 0.015,
+			hits: [
+				{ step: 0, chance: 1, length: 0.62, velocity: 0.11 },
+				{ step: 11, chance: 0.45, upper: true, length: 0.3, velocity: 0.07 },
+			],
+		},
+		bass: [
+			{ step: 0, chance: 1, interval: 0, length: 0.55 },
+			{ step: 10, chance: 0.6, interval: 7, length: 0.3 },
+		],
+		drums: { kick: [0, 10], ghostKick: [7], snare: [4, 12], snareStyle: 'snare', hats: [0, 2, 4, 6, 8, 10, 12, 14], hatLevel: 0.04 },
+		melodyChance: 0.12,
 		chords: [
-			{ bass: 38, keys: [53, 57, 60, 64] },
-			{ bass: 43, keys: [53, 59, 64, 69] },
-			{ bass: 36, keys: [52, 55, 59, 62] },
-			{ bass: 45, keys: [55, 60, 64, 71] },
+			{ bass: 38, keys: [53, 57, 60, 64] }, // Dm9
+			{ bass: 43, keys: [53, 59, 64, 69] }, // G13
+			{ bass: 36, keys: [52, 55, 59, 62] }, // Cmaj9
+			{ bass: 45, keys: [55, 60, 64, 71] }, // Am9
 		],
 	},
-	// Descending Fmaj9, Em7, Dm9, Cmaj7
+	// Upbeat and bright: faster, busier 16th hats, choppy comping, walking bass, in E flat.
 	coffee: {
 		label: 'Coffee shop',
-		bpm: 80,
+		bpm: 90,
+		swing: 0.18,
+		tone: 4200,
+		keys: {
+			partials: [
+				[1, 1],
+				[2, 0.35],
+				[3.01, 0.12],
+				[4.02, 0.05],
+			],
+			attack: 0.008,
+			hits: [
+				{ step: 0, chance: 1, length: 0.2, velocity: 0.1 },
+				{ step: 6, chance: 0.8, upper: true, length: 0.12, velocity: 0.08 },
+				{ step: 10, chance: 0.7, length: 0.15, velocity: 0.08 },
+				{ step: 14, chance: 0.35, upper: true, length: 0.1, velocity: 0.06 },
+			],
+		},
+		bass: [
+			{ step: 0, chance: 1, interval: 0, length: 0.22 },
+			{ step: 4, chance: 0.85, interval: 7, length: 0.2 },
+			{ step: 8, chance: 0.9, interval: 12, length: 0.2 },
+			{ step: 12, chance: 0.85, interval: 7, length: 0.2 },
+		],
+		drums: {
+			kick: [0, 7, 10],
+			ghostKick: [3, 14],
+			snare: [4, 12],
+			snareStyle: 'snare',
+			hats: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+			hatLevel: 0.03,
+		},
+		melodyChance: 0.22,
 		chords: [
-			{ bass: 41, keys: [57, 60, 64, 67] },
-			{ bass: 40, keys: [55, 59, 62, 64] },
-			{ bass: 38, keys: [53, 57, 60, 64] },
-			{ bass: 36, keys: [52, 55, 59, 62] },
+			{ bass: 39, keys: [55, 58, 62, 65] }, // Ebmaj9
+			{ bass: 41, keys: [56, 60, 63, 67] }, // Fm9
+			{ bass: 43, keys: [53, 58, 62, 65] }, // Gm7
+			{ bass: 44, keys: [55, 60, 63, 67] }, // Abmaj7
 		],
 	},
-	// Minor and slow: Am9, Fmaj7, Cmaj9, Em7
+	// Slow, muffled and sad: half-time rim clicks, soft pad-like chords, A minor.
 	rainy: {
 		label: 'Rainy day',
-		bpm: 66,
+		bpm: 62,
+		swing: 0.12,
+		tone: 1400,
+		keys: {
+			partials: [
+				[1, 1],
+				[2, 0.08],
+			],
+			attack: 0.35,
+			hits: [{ step: 0, chance: 1, length: 0.92, velocity: 0.1 }],
+		},
+		bass: [{ step: 0, chance: 1, interval: 0, length: 0.9 }],
+		drums: { kick: [0], ghostKick: [11], snare: [8], snareStyle: 'rim', hats: [4, 12], hatLevel: 0.02 },
+		melodyChance: 0.07,
 		chords: [
-			{ bass: 45, keys: [60, 64, 67, 71] },
-			{ bass: 41, keys: [53, 57, 60, 64] },
-			{ bass: 36, keys: [52, 55, 59, 62] },
-			{ bass: 40, keys: [55, 59, 62, 64] },
+			{ bass: 45, keys: [55, 60, 64, 71] }, // Am9
+			{ bass: 41, keys: [53, 57, 60, 64] }, // Fmaj7
+			{ bass: 38, keys: [53, 57, 60, 64] }, // Dm9
+			{ bass: 40, keys: [56, 59, 62, 65] }, // E7b9
 		],
 	},
 };
 
 const STEPS_PER_BAR = 16;
-const SWING = 0.3; // fraction of a 16th that off-beat 8ths are pushed late
+const LOOKAHEAD = 0.4; // seconds scheduled ahead while visible
+const LOOKAHEAD_HIDDEN = 2; // background tabs may run timers late
+const TIMER_MS = 50;
 
 const midiToHz = (midi: number) => 440 * 2 ** ((midi - 69) / 12);
 
@@ -59,13 +167,19 @@ export class LofiPlayer {
 	private output: GainNode; // volume
 	private fader: GainNode; // start/stop fades
 	private music: GainNode; // everything that goes through the "lofi" filter
+	private toneFilter: BiquadFilterNode;
 	private crackleBus: GainNode;
 	private rainBus: GainNode;
-	private wow: OscillatorNode; // slow pitch wobble, like a worn tape
-	private wowDepth: GainNode;
+	private wowDepth: GainNode; // slow pitch wobble, like a worn tape
 	private noise: AudioBuffer;
+	// Shared drum filters, so each hit only creates a source and a gain.
+	private snareFilter: BiquadFilterNode;
+	private rimFilter: BiquadFilterNode;
+	private hatFilter: BiquadFilterNode;
+	private popFilter: BiquadFilterNode;
 
 	private vibe: Vibe = VIBES.night;
+	private pendingVibe: Vibe | null = null;
 	private step = 0;
 	private bar = 0;
 	private nextStepTime = 0;
@@ -83,29 +197,34 @@ export class LofiPlayer {
 		this.fader.connect(this.output).connect(ctx.destination);
 
 		// Warm, dull top end and gentle glue are most of the "lofi" sound.
-		const lowpass = ctx.createBiquadFilter();
-		lowpass.type = 'lowpass';
-		lowpass.frequency.value = 2600;
-		lowpass.Q.value = 0.4;
+		this.toneFilter = ctx.createBiquadFilter();
+		this.toneFilter.type = 'lowpass';
+		this.toneFilter.frequency.value = this.vibe.tone;
+		this.toneFilter.Q.value = 0.4;
 		const compressor = ctx.createDynamicsCompressor();
 		compressor.threshold.value = -20;
 		compressor.ratio.value = 3;
 		this.music = ctx.createGain();
 		this.music.gain.value = 0.9;
-		this.music.connect(lowpass).connect(compressor).connect(this.fader);
+		this.music.connect(this.toneFilter).connect(compressor).connect(this.fader);
 
-		this.wow = ctx.createOscillator();
-		this.wow.frequency.value = 0.4;
+		const wow = ctx.createOscillator();
+		wow.frequency.value = 0.4;
 		this.wowDepth = ctx.createGain();
-		this.wowDepth.gain.value = 9; // cents
-		this.wow.connect(this.wowDepth);
-		this.wow.start();
+		this.wowDepth.gain.value = 8; // cents
+		wow.connect(this.wowDepth);
+		wow.start();
 
 		this.noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
 		const data = this.noise.getChannelData(0);
 		for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
 
+		this.snareFilter = this.filter('bandpass', 1700, 0.7, this.music);
+		this.rimFilter = this.filter('bandpass', 2600, 6, this.music);
+		this.hatFilter = this.filter('highpass', 6500, 0.7, this.music);
+
 		this.crackleBus = this.makeCrackleBed();
+		this.popFilter = this.filter('bandpass', 2500, 0.8, this.crackleBus);
 		this.rainBus = this.makeRain();
 	}
 
@@ -113,8 +232,13 @@ export class LofiPlayer {
 		this.output.gain.setTargetAtTime(value, this.ctx.currentTime, 0.05);
 	}
 
+	/** Takes effect at the next bar line so the groove never stumbles mid-bar. */
 	setVibe(id: VibeId) {
-		this.vibe = VIBES[id];
+		if (!this.playing) {
+			this.applyVibe(VIBES[id]);
+			return;
+		}
+		this.pendingVibe = VIBES[id];
 	}
 
 	setCrackle(on: boolean) {
@@ -136,7 +260,8 @@ export class LofiPlayer {
 		if (!this.timer) {
 			this.step = 0;
 			this.nextStepTime = now + 0.1;
-			this.timer = window.setInterval(() => this.schedule(), 25);
+			this.schedule();
+			this.timer = window.setInterval(() => this.schedule(), TIMER_MS);
 		}
 	}
 
@@ -150,16 +275,38 @@ export class LofiPlayer {
 		this.stopTimeout = window.setTimeout(() => {
 			window.clearInterval(this.timer);
 			this.timer = undefined;
+			if (this.pendingVibe) this.applyVibe(this.pendingVibe);
 		}, 1500);
 	}
 
+	private applyVibe(vibe: Vibe) {
+		this.vibe = vibe;
+		this.pendingVibe = null;
+		this.toneFilter.frequency.setTargetAtTime(vibe.tone, this.ctx.currentTime, 0.3);
+	}
+
 	private schedule() {
-		// Background tabs may run timers late, so look further ahead while hidden.
-		const lookahead = document.hidden ? 1.5 : 0.15;
-		const stepDuration = 60 / this.vibe.bpm / 4;
-		while (this.nextStepTime < this.ctx.currentTime + lookahead) {
-			const swing = this.step % 4 === 2 ? SWING * stepDuration : 0;
+		const now = this.ctx.currentTime;
+		// If the timer was starved for longer than the lookahead, skip the missed steps
+		// rather than playing them all at once late (which is what a stutter sounds like).
+		if (this.nextStepTime < now) {
+			const stepDuration = 60 / this.vibe.bpm / 4;
+			const missed = Math.ceil((now - this.nextStepTime) / stepDuration);
+			this.advance(missed, stepDuration);
+		}
+
+		const horizon = now + (document.hidden ? LOOKAHEAD_HIDDEN : LOOKAHEAD);
+		while (this.nextStepTime < horizon) {
+			if (this.step === 0 && this.pendingVibe) this.applyVibe(this.pendingVibe);
+			const stepDuration = 60 / this.vibe.bpm / 4;
+			const swing = this.step % 4 === 2 ? this.vibe.swing * stepDuration : 0;
 			this.playStep(this.step, this.nextStepTime + swing, stepDuration);
+			this.advance(1, stepDuration);
+		}
+	}
+
+	private advance(steps: number, stepDuration: number) {
+		for (let i = 0; i < steps; i++) {
 			this.nextStepTime += stepDuration;
 			this.step = (this.step + 1) % STEPS_PER_BAR;
 			if (this.step === 0) this.bar++;
@@ -167,49 +314,51 @@ export class LofiPlayer {
 	}
 
 	private playStep(step: number, t: number, stepDuration: number) {
-		const chord = this.vibe.chords[this.bar % this.vibe.chords.length];
+		const { vibe } = this;
+		const chord = vibe.chords[this.bar % vibe.chords.length];
 		const barLength = stepDuration * STEPS_PER_BAR;
+		const chance = (p: number) => Math.random() < p;
 
-		// Drums: kick on 1 and the "and" of 3, snare on 2 and 4, soft 8th-note hats.
-		if (step === 0 || step === 10 || (step === 7 && Math.random() < 0.3)) this.kick(t);
-		if (step === 4 || step === 12) this.snare(t);
-		if (step % 2 === 0 && Math.random() > 0.1) this.hat(t, step % 4 === 0 ? 0.05 : 0.03);
-
-		// Keys: full chord on the downbeat (lightly strummed), sometimes a syncopated re-hit.
-		if (step === 0) {
-			chord.keys.forEach((note, i) => this.keys(note, t + i * 0.025, barLength * 0.62, 0.11));
+		const { drums } = vibe;
+		if (drums.kick.includes(step) || (drums.ghostKick.includes(step) && chance(0.35))) this.kick(t);
+		if (drums.snare.includes(step)) {
+			if (drums.snareStyle === 'rim') this.rim(t);
+			else this.snare(t);
 		}
-		if (step === 11 && Math.random() < 0.45) {
-			chord.keys.slice(1).forEach((note, i) => this.keys(note, t + i * 0.02, barLength * 0.3, 0.07));
+		if (drums.hats.includes(step) && chance(0.92)) {
+			const accent = step % 4 === 0 ? 1.4 : step % 2 === 0 ? 1 : 0.6;
+			this.hat(t, drums.hatLevel * accent);
 		}
 
-		// Bass: root on the downbeat, a pickup root or fifth later in the bar.
-		if (step === 0) this.bass(chord.bass, t, barLength * 0.55);
-		if (step === 10 && Math.random() < 0.6) this.bass(chord.bass + (Math.random() < 0.5 ? 7 : 0), t, barLength * 0.3);
+		for (const hit of vibe.keys.hits) {
+			if (hit.step !== step || !chance(hit.chance)) continue;
+			const notes = hit.upper ? chord.keys.slice(1) : chord.keys;
+			notes.forEach((note, i) => this.keys(note, t + i * 0.022, hit.length * barLength, hit.velocity));
+		}
+
+		for (const hit of vibe.bass) {
+			if (hit.step === step && chance(hit.chance)) this.bass(chord.bass + hit.interval, t, hit.length * barLength);
+		}
 
 		// Sparse melody: a chord tone an octave up, now and then.
-		if (step % 2 === 0 && step !== 0 && Math.random() < 0.12) {
-			const note = chord.keys[Math.floor(Math.random() * chord.keys.length)] + 12;
-			this.bell(note, t);
+		if (step % 2 === 0 && step !== 0 && chance(vibe.melodyChance)) {
+			this.bell(chord.keys[Math.floor(Math.random() * chord.keys.length)] + 12, t);
 		}
 
 		// Vinyl pops.
-		if (Math.random() < 0.35) this.pop(t + Math.random() * stepDuration);
+		if (chance(0.25)) this.pop(t + Math.random() * stepDuration);
 	}
 
 	private keys(midi: number, t: number, length: number, velocity: number) {
 		const { ctx } = this;
+		const { attack, partials } = this.vibe.keys;
 		const gain = ctx.createGain();
 		gain.gain.setValueAtTime(0, t);
-		gain.gain.linearRampToValueAtTime(velocity, t + 0.015);
-		gain.gain.setTargetAtTime(velocity * 0.45, t + 0.02, 0.35);
-		gain.gain.setTargetAtTime(0, t + length, 0.25);
-		// Electric-piano-ish: a sine fundamental plus a quiet bell-like partial.
-		for (const [ratio, level] of [
-			[1, 1],
-			[2, 0.18],
-			[3.01, 0.05],
-		]) {
+		gain.gain.linearRampToValueAtTime(velocity, t + attack);
+		gain.gain.setTargetAtTime(velocity * 0.45, t + attack + 0.005, 0.35);
+		gain.gain.setTargetAtTime(0, t + Math.max(length, attack + 0.05), 0.25);
+		gain.connect(this.music);
+		for (const [ratio, level] of partials) {
 			const osc = ctx.createOscillator();
 			osc.frequency.value = midiToHz(midi) * ratio;
 			osc.detune.value = (Math.random() - 0.5) * 6;
@@ -221,22 +370,20 @@ export class LofiPlayer {
 			osc.stop(t + length + 1.5);
 			osc.onended = () => this.wowDepth.disconnect(osc.detune);
 		}
-		gain.connect(this.music);
 	}
 
 	private bass(midi: number, t: number, length: number) {
 		const { ctx } = this;
 		const osc = ctx.createOscillator();
-		osc.type = 'sine';
 		osc.frequency.value = midiToHz(midi);
 		const gain = ctx.createGain();
 		gain.gain.setValueAtTime(0, t);
 		gain.gain.linearRampToValueAtTime(0.32, t + 0.02);
 		gain.gain.setTargetAtTime(0.2, t + 0.03, 0.2);
-		gain.gain.setTargetAtTime(0, t + length, 0.08);
+		gain.gain.setTargetAtTime(0, t + length, 0.06);
 		osc.connect(gain).connect(this.music);
 		osc.start(t);
-		osc.stop(t + length + 0.6);
+		osc.stop(t + length + 0.5);
 	}
 
 	private bell(midi: number, t: number) {
@@ -269,44 +416,39 @@ export class LofiPlayer {
 	}
 
 	private snare(t: number) {
-		const noise = this.noiseSource(t, 0.25);
-		const band = this.ctx.createBiquadFilter();
-		band.type = 'bandpass';
-		band.frequency.value = 1700;
-		band.Q.value = 0.7;
-		const gain = this.ctx.createGain();
-		gain.gain.setValueAtTime(0.28, t);
-		gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-		noise.connect(band).connect(gain).connect(this.music);
+		this.noiseHit(t, 0.25, 0.28, 0.2, this.snareFilter);
+	}
+
+	private rim(t: number) {
+		this.noiseHit(t, 0.06, 0.35, 0.04, this.rimFilter);
 	}
 
 	private hat(t: number, level: number) {
-		const noise = this.noiseSource(t, 0.08);
-		const high = this.ctx.createBiquadFilter();
-		high.type = 'highpass';
-		high.frequency.value = 6500;
-		const gain = this.ctx.createGain();
-		gain.gain.setValueAtTime(level, t);
-		gain.gain.exponentialRampToValueAtTime(0.0005, t + 0.06);
-		noise.connect(high).connect(gain).connect(this.music);
+		this.noiseHit(t, 0.08, level, 0.06, this.hatFilter);
 	}
 
 	private pop(t: number) {
-		const noise = this.noiseSource(t, 0.01);
-		const high = this.ctx.createBiquadFilter();
-		high.type = 'highpass';
-		high.frequency.value = 1800;
-		const gain = this.ctx.createGain();
-		gain.gain.setValueAtTime(0.03 + Math.random() * 0.1, t);
-		gain.gain.exponentialRampToValueAtTime(0.0005, t + 0.008);
-		noise.connect(high).connect(gain).connect(this.crackleBus);
+		this.noiseHit(t, 0.01, 0.015 + Math.random() * 0.035, 0.008, this.popFilter);
 	}
 
-	private noiseSource(t: number, length: number) {
+	/** A burst of noise with a quick decay, fed into one of the shared filters. */
+	private noiseHit(t: number, length: number, level: number, decay: number, destination: AudioNode) {
 		const source = this.ctx.createBufferSource();
 		source.buffer = this.noise;
+		const gain = this.ctx.createGain();
+		gain.gain.setValueAtTime(level, t);
+		gain.gain.exponentialRampToValueAtTime(0.0005, t + decay);
+		source.connect(gain).connect(destination);
 		source.start(t, Math.random() * 1.5, length);
-		return source;
+	}
+
+	private filter(type: BiquadFilterType, frequency: number, q: number, destination: AudioNode) {
+		const node = this.ctx.createBiquadFilter();
+		node.type = type;
+		node.frequency.value = frequency;
+		node.Q.value = q;
+		node.connect(destination);
+		return node;
 	}
 
 	private loopNoise() {
@@ -320,13 +462,10 @@ export class LofiPlayer {
 	/** Constant soft hiss under the pops; returns the bus the pops also feed. */
 	private makeCrackleBed() {
 		const bus = this.ctx.createGain();
-		const band = this.ctx.createBiquadFilter();
-		band.type = 'bandpass';
-		band.frequency.value = 4000;
-		band.Q.value = 0.5;
 		const hiss = this.ctx.createGain();
 		hiss.gain.value = 0.012;
-		this.loopNoise().connect(band).connect(hiss).connect(bus);
+		this.loopNoise().connect(this.filter('bandpass', 4000, 0.5, hiss));
+		hiss.connect(bus);
 		bus.connect(this.fader);
 		return bus;
 	}
@@ -335,12 +474,6 @@ export class LofiPlayer {
 	private makeRain() {
 		const bus = this.ctx.createGain();
 		bus.gain.value = 0;
-		const low = this.ctx.createBiquadFilter();
-		low.type = 'lowpass';
-		low.frequency.value = 1400;
-		const high = this.ctx.createBiquadFilter();
-		high.type = 'highpass';
-		high.frequency.value = 350;
 		const level = this.ctx.createGain();
 		level.gain.value = 0.16;
 		const swell = this.ctx.createOscillator();
@@ -349,7 +482,9 @@ export class LofiPlayer {
 		swellDepth.gain.value = 0.04;
 		swell.connect(swellDepth).connect(level.gain);
 		swell.start();
-		this.loopNoise().connect(low).connect(high).connect(level).connect(bus);
+		const high = this.filter('highpass', 350, 0.7, level);
+		this.loopNoise().connect(this.filter('lowpass', 1400, 0.7, high));
+		level.connect(bus);
 		bus.connect(this.fader);
 		return bus;
 	}
