@@ -7,19 +7,19 @@
   --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
-  /* Brand palette — role-based, contrast-checked against each background it
+  /* Brand palette - role-based, contrast-checked against each background it
      actually sits on (see conversation for the full matrix):
        text/canvas 11.7:1, text/blush 9.8:1, primary/canvas 6.3:1,
-       canvas/primary 6.3:1, text/coral 4.7:1 — all pass AA.
+       canvas/primary 6.3:1, text/coral 4.7:1 - all pass AA.
      Secondary (1.9:1) and coral (2.5:1) fall under 3:1 against canvas, so
-     they're used decoratively only (borders, rings, icons) — never as text
+     they're used decoratively only (borders, rings, icons) - never as text
      on a light fill. */
-  --color-canvas: #faefed; /* Background — warm ivory, dominant fill */
-  --color-primary: #006078; /* Primary — deep teal, CTAs & brand accents */
-  --color-secondary: #82bac4; /* Secondary — muted cyan, borders & accents */
-  --color-blush: #ffd4d1; /* Soft accent — card & panel fills */
-  --color-coral: #e37c78; /* Highlight — eyebrows, hover, sparing use */
-  --color-text: #19343a; /* Text/Ink — deep charcoal, all copy */
+  --color-canvas: #faefed; /* Background - warm ivory, dominant fill */
+  --color-primary: #006078; /* Primary - deep teal, CTAs & brand accents */
+  --color-secondary: #82bac4; /* Secondary - muted cyan, borders & accents */
+  --color-blush: #ffd4d1; /* Soft accent - card & panel fills */
+  --color-coral: #e37c78; /* Highlight - eyebrows, hover, sparing use */
+  --color-text: #19343a; /* Text/Ink - deep charcoal, all copy */
 
   --animate-float: float 7s ease-in-out infinite;
   --animate-spin-slow: spin 40s linear infinite;
@@ -68,7 +68,7 @@
   }
 }
 
-/* Faint dot grid — a nod to die/wafer layouts. Pair with a mask utility
+/* Faint dot grid - a nod to die/wafer layouts. Pair with a mask utility
    so it fades out instead of ending at a hard edge. */
 @utility bg-dots {
   background-image: radial-gradient(
