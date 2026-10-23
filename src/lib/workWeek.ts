@@ -1,4 +1,4 @@
-// Work weeks run Sunday..Saturday, and ww1 is the week containing Jan 1 — so
+// Work weeks run Sunday..Saturday, and ww1 is the week containing Jan 1 - so
 // the last days of December can belong to ww1 of the next year (e.g. Mon
 // Dec 28, 2026 is ww1.1 of 2027, and Fri Jan 1, 2027 is ww1.5). Monday is .1
 // through Friday .5; weekends get no workday label.
