@@ -140,24 +140,43 @@ const mobileLinkClass =
 			{
 				navItems.map((item) =>
 					item === 'tools' ? (
-						<li class="pt-2">
-							<p class="px-4 pb-1 text-xs font-semibold tracking-[0.15em] text-text/60 uppercase">Common Tools</p>
-							<ul class="space-y-1">
+						<li>
+							<!-- Collapsed by default; tap to reveal the tools. Opens itself on a tool page. -->
+							<button
+								id="mobile-tools-button"
+								type="button"
+								aria-expanded={onToolPage ? 'true' : 'false'}
+								aria-controls="mobile-tools"
+								class:list={[
+									mobileLinkClass,
+									'group w-full justify-between text-left',
+									onToolPage && 'text-primary',
+								]}
+							>
+								Common Tools
+								<svg class="h-5 w-5 text-text/60 transition-transform duration-200 group-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+									<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
+								</svg>
+							</button>
+							<ul id="mobile-tools" hidden={!onToolPage} class="mx-2 mt-1 space-y-0.5 rounded-xl bg-blush/50 p-1.5">
 								{tools.map((tool) => (
 									<li>
-										<a href={tool.href} aria-current={currentPath === tool.href ? 'page' : undefined} class:list={[mobileLinkClass, 'gap-3']}>
-											<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas" aria-hidden="true">
-												<svg
-													class="h-4 w-4"
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="2"
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													set:html={tool.icon}
-												/>
-											</span>
+										<a
+											href={tool.href}
+											aria-current={currentPath === tool.href ? 'page' : undefined}
+											class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-text/85 transition-colors hover:bg-canvas aria-[current=page]:bg-primary aria-[current=page]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+										>
+											<svg
+												class="h-4 w-4 shrink-0 opacity-70"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												aria-hidden="true"
+												set:html={tool.icon}
+											/>
 											{tool.label}
 										</a>
 									</li>
@@ -207,6 +226,14 @@ const mobileLinkClass =
 		menu.hidden = !open;
 	};
 	menuButton.addEventListener('click', () => setMenu(menu.hidden));
+
+	const toolsButton = document.getElementById('mobile-tools-button')!;
+	const toolsList = document.getElementById('mobile-tools')!;
+	toolsButton.addEventListener('click', () => {
+		const open = toolsList.hidden;
+		toolsList.hidden = !open;
+		toolsButton.setAttribute('aria-expanded', String(open));
+	});
 	document.addEventListener('click', (event) => {
 		if (!menu.hidden && !header.contains(event.target as Node)) setMenu(false);
 	});
