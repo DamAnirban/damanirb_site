@@ -1,0 +1,189 @@
+---
+// Homepage gallery ("From the workbench"): a bento grid (first photo large) that opens
+// a full-screen viewer with arrow-key and swipe navigation. Photos live in src/data/workbench.ts.
+import { Picture, getImage } from 'astro:assets';
+import { workbenchPhotos } from '../data/workbench';
+
+// Large versions for the viewer, generated at build time.
+const slides = await Promise.all(
+	workbenchPhotos.map(async (photo) => {
+		const large = await getImage({ src: photo.image, width: Math.min(photo.image.width, 1800), format: 'webp' });
+		return { src: large.src, alt: photo.alt, title: photo.title, caption: photo.caption };
+	}),
+);
+---
+
+<section class="mx-auto max-w-5xl px-6 py-20 sm:py-28" aria-labelledby="workbench-heading">
+	<div data-reveal>
+		<p class="flex items-center gap-3 font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase">
+			<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true"></span>
+			Gallery
+		</p>
+		<div class="mt-3 flex flex-wrap items-end justify-between gap-4">
+			<h2 id="workbench-heading" class="text-balance font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+				From the Workbench
+			</h2>
+			<p class="max-w-sm text-sm text-text/70">Robots, circuits and the data that comes out of them. Tap a photo to see it full size.</p>
+		</div>
+	</div>
+
+	<ul class="mt-10 grid auto-rows-[9rem] grid-cols-2 gap-3 sm:auto-rows-[12rem] lg:auto-rows-[13rem] lg:grid-cols-4 lg:gap-4">
+		{
+			workbenchPhotos.map((photo, i) => (
+				<li
+					class:list={[i === 0 ? 'col-span-2 row-span-2' : 'lg:col-span-2']}
+					data-reveal
+					style={`--reveal-delay: ${Math.min(i, 4) * 80}ms`}
+				>
+					<button
+						type="button"
+						data-slide={i}
+						aria-label={`View larger: ${photo.title}`}
+						class:list={[
+							'group relative block h-full w-full overflow-hidden rounded-2xl text-left shadow-sm ring-1 ring-text/10 transition duration-300 hover:shadow-xl hover:shadow-primary/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas',
+							photo.fit === 'contain' ? 'bg-[#f0f0f0]' : 'bg-text',
+						]}
+					>
+						<Picture
+							src={photo.image}
+							formats={['avif', 'webp']}
+							alt={photo.alt}
+							widths={i === 0 ? [600, 1000, 1400] : [400, 700, 1000]}
+							sizes={i === 0 ? '(min-width: 1024px) 480px, 100vw' : '(min-width: 1024px) 480px, 50vw'}
+							loading="lazy"
+							class:list={[
+								'h-full w-full transition-transform duration-500 group-hover:scale-105',
+								photo.fit === 'contain' ? 'object-contain p-2' : 'object-cover',
+							]}
+						/>
+						<!-- Title always shows; the caption slides up on hover/focus. -->
+						<span class="absolute inset-x-0 bottom-0 bg-linear-to-t from-text/85 via-text/50 to-transparent p-3 pt-10 sm:p-4 sm:pt-12">
+							<span class:list={['block font-display font-semibold text-canvas', i === 0 ? 'text-base sm:text-xl' : 'text-sm sm:text-base']}>
+								{photo.title}
+							</span>
+							<span class="hidden max-h-0 overflow-hidden text-sm text-canvas/85 opacity-0 transition-all duration-300 group-hover:max-h-16 group-hover:opacity-100 group-focus-visible:max-h-16 group-focus-visible:opacity-100 sm:block">
+								{photo.caption}
+							</span>
+						</span>
+						<span
+							class="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-canvas/85 text-primary opacity-0 shadow transition-opacity duration-300 group-hover:opacity-100"
+							aria-hidden="true"
+						>
+							<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+							</svg>
+						</span>
+					</button>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<!-- Full-screen viewer -->
+<dialog
+	id="workbench-viewer"
+	aria-label="Photo viewer"
+	data-slides={JSON.stringify(slides)}
+	class="m-0 h-full max-h-none w-full max-w-none bg-text/95 p-0 text-canvas backdrop:bg-text/80 open:flex open:flex-col"
+>
+	<div class="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+		<p class="text-sm text-canvas/70"><span data-counter></span></p>
+		<button
+			type="button"
+			data-close
+			aria-label="Close"
+			class="flex h-11 w-11 items-center justify-center rounded-full bg-canvas/10 transition-colors hover:bg-canvas/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral"
+		>
+			<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+		</button>
+	</div>
+	<div class="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-20" data-stage>
+		<img data-image alt="" class="max-h-full max-w-full rounded-lg object-contain shadow-2xl select-none" draggable="false" />
+		<button
+			type="button"
+			data-prev
+			aria-label="Previous photo"
+			class="absolute left-2 hidden h-12 w-12 items-center justify-center rounded-full bg-canvas/10 transition-colors hover:bg-canvas/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral sm:left-4 sm:flex"
+		>
+			<svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.83 10l3.94 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02z" clip-rule="evenodd"></path></svg>
+		</button>
+		<button
+			type="button"
+			data-next
+			aria-label="Next photo"
+			class="absolute right-2 hidden h-12 w-12 items-center justify-center rounded-full bg-canvas/10 transition-colors hover:bg-canvas/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral sm:right-4 sm:flex"
+		>
+			<svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.17 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02z" clip-rule="evenodd"></path></svg>
+		</button>
+	</div>
+	<div class="px-6 pt-3 pb-6 text-center" aria-live="polite">
+		<p data-title class="font-display text-lg font-semibold"></p>
+		<p data-caption class="mx-auto mt-1 max-w-xl text-sm text-canvas/75"></p>
+		<p class="mt-2 text-xs text-canvas/50 sm:hidden">Swipe to see more</p>
+	</div>
+</dialog>
+
+<script>
+	interface Slide {
+		src: string;
+		alt: string;
+		title: string;
+		caption: string;
+	}
+
+	const viewer = document.getElementById('workbench-viewer') as HTMLDialogElement;
+	const slides: Slide[] = JSON.parse(viewer.dataset.slides!);
+	const image = viewer.querySelector<HTMLImageElement>('[data-image]')!;
+	let index = 0;
+	let opener: HTMLElement | null = null;
+
+	function show(i: number) {
+		index = (i + slides.length) % slides.length;
+		const slide = slides[index];
+		image.src = slide.src;
+		image.alt = slide.alt;
+		viewer.querySelector('[data-title]')!.textContent = slide.title;
+		viewer.querySelector('[data-caption]')!.textContent = slide.caption;
+		viewer.querySelector('[data-counter]')!.textContent = `${index + 1} / ${slides.length}`;
+		// Warm the neighbours so stepping through feels instant.
+		[index - 1, index + 1].forEach((n) => (new Image().src = slides[(n + slides.length) % slides.length].src));
+	}
+
+	for (const tile of document.querySelectorAll<HTMLButtonElement>('[data-slide]')) {
+		tile.addEventListener('click', () => {
+			opener = tile;
+			show(Number(tile.dataset.slide));
+			viewer.showModal();
+			document.documentElement.style.overflow = 'hidden';
+		});
+	}
+
+	viewer.querySelector('[data-prev]')!.addEventListener('click', () => show(index - 1));
+	viewer.querySelector('[data-next]')!.addEventListener('click', () => show(index + 1));
+	viewer.querySelector('[data-close]')!.addEventListener('click', () => viewer.close());
+	viewer.addEventListener('keydown', (event) => {
+		if (event.key === 'ArrowLeft') show(index - 1);
+		if (event.key === 'ArrowRight') show(index + 1);
+	});
+	// Clicking the dark area around the photo closes the viewer.
+	viewer.querySelector('[data-stage]')!.addEventListener('click', (event) => {
+		if (event.target === event.currentTarget) viewer.close();
+	});
+	viewer.addEventListener('close', () => {
+		document.documentElement.style.overflow = '';
+		opener?.focus();
+	});
+
+	// Swipe left/right on touch screens.
+	let startX: number | null = null;
+	viewer.addEventListener('pointerdown', (event) => {
+		if (event.pointerType !== 'mouse') startX = event.clientX;
+	});
+	viewer.addEventListener('pointerup', (event) => {
+		if (startX === null) return;
+		const dx = event.clientX - startX;
+		startX = null;
+		if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
+	});
+</script>
