@@ -1,0 +1,110 @@
+---
+import { render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { STATUS_LABELS, formatDate, getTracks, type TrackWithLessons } from '../../lib/content';
+
+export async function getStaticPaths() {
+	const tracks = await getTracks();
+	return tracks.map((info) => ({ params: { track: info.track.id }, props: { info } }));
+}
+
+const { info } = Astro.props as { info: TrackWithLessons };
+const { track, lessons, published, status } = info;
+const { Content } = await render(track);
+const percent = Math.round((published / lessons.length) * 100);
+const nextUp = lessons.find((lesson) => lesson.post);
+---
+
+<Layout title={`${track.data.title} - VLSI - Anirban Dam`} description={track.data.summary}>
+	<section class="mx-auto max-w-3xl px-6 pt-10 pb-20 sm:pt-14">
+		<nav aria-label="Breadcrumb" class="text-sm text-text/70">
+			<a href="/vlsi" class="font-medium text-primary hover:text-coral">VLSI</a>
+			<span aria-hidden="true"> / </span>
+			<span>Track</span>
+		</nav>
+
+		<div class="mt-6 flex flex-wrap items-center gap-2 text-xs font-semibold">
+			<span class="rounded-full bg-blush px-2.5 py-0.5 text-primary">{STATUS_LABELS[status]}</span>
+			{track.data.level && <span class="rounded-full bg-secondary/25 px-2.5 py-0.5 text-text/80">{track.data.level}</span>}
+			{track.data.draft && <span class="rounded-full bg-coral px-2.5 py-0.5 text-text">Draft: only visible in dev</span>}
+		</div>
+		<h1 class="mt-4 text-balance font-display text-4xl font-bold tracking-tight text-text sm:text-5xl">{track.data.title}</h1>
+		<p class="mt-4 text-lg leading-relaxed text-text/80">{track.data.summary}</p>
+
+		<div class="mt-8 rounded-2xl border border-text/10 bg-canvas/80 p-5 shadow-sm">
+			<div class="flex items-baseline justify-between text-sm font-semibold text-text/75">
+				<span>{published} of {lessons.length} lessons published</span>
+				<span>{percent}%</span>
+			</div>
+			<div class="mt-2 h-2.5 overflow-hidden rounded-full bg-text/10" aria-hidden="true">
+				<div class="h-full rounded-full bg-linear-to-r from-primary to-secondary" style={`width: ${percent}%`}></div>
+			</div>
+			<div class="mt-4 flex flex-wrap gap-3">
+				{
+					nextUp?.post && (
+						<a
+							href={`/blog/${nextUp.post.id}`}
+							class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-canvas shadow-md shadow-primary/25 transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+						>
+							Start with lesson {nextUp.number} <span aria-hidden="true">→</span>
+						</a>
+					)
+				}
+				{
+					track.data.playlist && (
+						<a
+							href={track.data.playlist}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center rounded-full border-2 border-text/15 px-5 py-2 text-sm font-semibold text-text transition-colors hover:border-primary hover:text-primary"
+						>
+							YouTube playlist
+						</a>
+					)
+				}
+			</div>
+		</div>
+
+		<div class="prose-site mt-10">
+			<Content />
+		</div>
+
+		<h2 class="mt-12 font-display text-2xl font-bold text-text">Lessons</h2>
+		<ol class="mt-5 space-y-3">
+			{
+				lessons.map((lesson) =>
+					lesson.post ? (
+						<li>
+							<a
+								href={`/blog/${lesson.post.id}`}
+								class="group flex items-center gap-4 rounded-2xl border border-text/10 bg-canvas/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-secondary hover:shadow-md"
+							>
+								<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-display font-bold text-canvas">
+									{lesson.number}
+								</span>
+								<span class="min-w-0 flex-1">
+									<span class="block font-semibold text-text group-hover:text-primary">{lesson.title}</span>
+									<span class="block text-xs text-text/60">
+										{formatDate(lesson.post.data.date)}
+										{lesson.post.data.pdf && ' · PDF notes'}
+									</span>
+								</span>
+								<span aria-hidden="true" class="text-primary transition-transform group-hover:translate-x-1">→</span>
+							</a>
+						</li>
+					) : (
+						<li class="flex items-center gap-4 rounded-2xl border border-dashed border-text/20 p-4">
+							<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-text/15 font-display font-bold text-text/50">
+								{lesson.number}
+							</span>
+							<span class="min-w-0 flex-1">
+								<span class="block font-semibold text-text/60">{lesson.title}</span>
+								<span class="block text-xs text-text/60">Coming soon</span>
+							</span>
+						</li>
+					),
+				)
+			}
+		</ol>
+	</section>
+</Layout>

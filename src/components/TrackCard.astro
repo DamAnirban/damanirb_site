@@ -1,0 +1,54 @@
+---
+import { STATUS_LABELS, type TrackWithLessons } from '../lib/content';
+
+interface Props {
+	info: TrackWithLessons;
+}
+
+const { track, lessons, published, status } = Astro.props.info;
+const percent = Math.round((published / lessons.length) * 100);
+---
+
+<article class="group relative flex h-full flex-col rounded-2xl border border-text/10 bg-canvas/80 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-xl hover:shadow-primary/10">
+	<div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+		<span
+			class:list={[
+				'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5',
+				status === 'live' && 'bg-primary text-canvas',
+				status === 'in-progress' && 'bg-blush text-primary',
+				status === 'coming-soon' && 'border border-text/20 text-text/70',
+			]}
+		>
+			<span
+				class:list={['h-1.5 w-1.5 rounded-full', status === 'live' ? 'bg-canvas' : status === 'in-progress' ? 'bg-coral' : 'bg-text/40']}
+				aria-hidden="true"></span>
+			{STATUS_LABELS[status]}
+		</span>
+		{track.data.level && <span class="rounded-full bg-secondary/25 px-2.5 py-0.5 text-text/80">{track.data.level}</span>}
+		{track.data.draft && <span class="rounded-full bg-coral px-2.5 py-0.5 text-text">Draft</span>}
+	</div>
+
+	<h3 class="mt-4 font-display text-xl font-semibold text-text">
+		<a href={`/vlsi/${track.id}`} class="after:absolute after:inset-0 focus:outline-none focus-visible:after:rounded-2xl focus-visible:after:ring-2 focus-visible:after:ring-primary">
+			{track.data.title}
+		</a>
+	</h3>
+	<p class="mt-2 text-sm leading-relaxed text-text/70">{track.data.summary}</p>
+
+	<div class="mt-auto pt-6">
+		<div class="flex items-baseline justify-between text-xs font-semibold text-text/70">
+			<span>{published} of {lessons.length} lessons</span>
+			<span>{percent}%</span>
+		</div>
+		<div
+			class="mt-2 h-2 overflow-hidden rounded-full bg-text/10"
+			role="progressbar"
+			aria-label={`${track.data.title} progress`}
+			aria-valuemin="0"
+			aria-valuemax={lessons.length}
+			aria-valuenow={published}
+		>
+			<div class="h-full rounded-full bg-linear-to-r from-primary to-secondary" style={`width: ${percent}%`}></div>
+		</div>
+	</div>
+</article>

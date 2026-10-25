@@ -1,0 +1,55 @@
+---
+// Click-to-load YouTube player. Nothing is requested from YouTube/Google until the
+// visitor presses play; then the video loads from youtube-nocookie.com (privacy-enhanced mode).
+import CircuitTraces from './CircuitTraces.astro';
+
+interface Props {
+	id: string;
+	title: string;
+}
+
+const { id, title } = Astro.props;
+const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+---
+
+<figure>
+	<div class="relative aspect-video overflow-hidden rounded-2xl bg-text shadow-xl shadow-primary/20" data-youtube={id} data-title={title}>
+		<button
+			type="button"
+			class="group absolute inset-0 flex flex-col items-center justify-center gap-4 bg-linear-to-br from-primary via-primary to-text text-canvas focus:outline-none focus-visible:ring-4 focus-visible:ring-coral focus-visible:ring-inset"
+			aria-label={`Play video: ${title}`}
+		>
+			<CircuitTraces class="pointer-events-none absolute -right-10 -bottom-10 w-[28rem] text-canvas/10" />
+			<span
+				class="relative flex h-16 w-16 items-center justify-center rounded-full bg-coral text-text shadow-xl transition-transform duration-300 group-hover:scale-110 sm:h-20 sm:w-20"
+				aria-hidden="true"
+			>
+				<svg class="ml-1 h-7 w-7 sm:h-8 sm:w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z"></path></svg>
+			</span>
+			<span class="relative max-w-md px-6 text-center font-display text-lg font-semibold text-balance sm:text-xl">{title}</span>
+		</button>
+	</div>
+	<figcaption class="mt-2 text-xs text-text/60">
+		Pressing play loads the video from YouTube.{' '}
+		<a href={watchUrl} target="_blank" rel="noopener noreferrer" class="font-medium text-primary underline underline-offset-2 hover:text-coral">
+			Watch on YouTube
+		</a>
+	</figcaption>
+</figure>
+
+<script>
+	for (const box of document.querySelectorAll<HTMLElement>('[data-youtube]')) {
+		box.querySelector('button')!.addEventListener('click', () => {
+			const iframe = document.createElement('iframe');
+			iframe.src = `https://www.youtube-nocookie.com/embed/${box.dataset.youtube}?autoplay=1&rel=0`;
+			iframe.title = box.dataset.title ?? 'YouTube video';
+			iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+			iframe.allowFullscreen = true;
+			// YouTube refuses embeds that send no referrer.
+			iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+			iframe.className = 'absolute inset-0 h-full w-full';
+			box.replaceChildren(iframe);
+			iframe.focus();
+		});
+	}
+</script>

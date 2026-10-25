@@ -1,0 +1,61 @@
+---
+// A post's cover: its own image if it has one, otherwise a generated tile in the site palette
+// (so there's no need to pull thumbnails from YouTube).
+import { Picture } from 'astro:assets';
+import CircuitTraces from './CircuitTraces.astro';
+import type { Post } from '../lib/content';
+
+interface Props {
+	post: Post;
+	class?: string;
+}
+
+const { post, class: className } = Astro.props;
+const { cover, type, title, lesson } = post.data;
+const isVideo = type === 'video';
+---
+
+<div class:list={['relative aspect-video overflow-hidden', className]}>
+	{
+		cover ? (
+			<Picture src={cover} formats={['avif', 'webp']} alt="" widths={[400, 800]} sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw" class="h-full w-full object-cover" />
+		) : (
+			<div
+				class:list={[
+					'flex h-full w-full items-center justify-center',
+					isVideo ? 'bg-linear-to-br from-primary to-text text-canvas' : 'bg-linear-to-br from-blush via-canvas to-secondary/50 text-primary',
+				]}
+			>
+				<CircuitTraces class:list={['pointer-events-none absolute -right-8 -bottom-8 w-72', isVideo ? 'text-canvas/10' : 'text-primary/10']} />
+				<span
+					class:list={[
+						'relative flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform duration-300 group-hover:scale-110',
+						isVideo ? 'bg-coral text-text' : 'bg-canvas text-primary',
+					]}
+					aria-hidden="true"
+				>
+					{
+						isVideo ? (
+							<svg class="ml-0.5 h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+								<path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z" />
+							</svg>
+						) : (
+							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+								<path d="M14 3v6h6M8 13h8M8 17h5" />
+							</svg>
+						)
+					}
+				</span>
+				{
+					lesson && (
+						<span class="absolute top-3 left-3 rounded-full bg-canvas/90 px-2.5 py-1 text-xs font-bold text-primary">
+							Lesson {lesson}
+						</span>
+					)
+				}
+				<span class="sr-only">{title}</span>
+			</div>
+		)
+	}
+</div>

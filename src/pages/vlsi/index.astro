@@ -1,0 +1,181 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CircuitTraces from '../../components/CircuitTraces.astro';
+import PostCard from '../../components/PostCard.astro';
+import TrackCard from '../../components/TrackCard.astro';
+import { formatDate, getPosts, getTracks } from '../../lib/content';
+import { YOUTUBE_CHANNEL_URL } from '../../data/site';
+
+const tracks = await getTracks();
+const posts = await getPosts();
+const latestVideos = posts.filter((post) => post.data.type === 'video').slice(0, 3);
+const notes = posts.filter((post) => post.data.pdf);
+
+// "Start here" = lesson 1 of the first track that has it published.
+const startLesson = tracks.map((t) => t.lessons[0].post).find(Boolean);
+
+const eyebrow = 'flex items-center gap-3 font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase';
+---
+
+<Layout
+	title="VLSI - Anirban Dam"
+	description="Learn VLSI and chip design with Anirban Dam: video lesson tracks, lecture notes and articles on design flows, timing and emulation."
+>
+	<!-- Hero -->
+	<section class="mx-auto max-w-6xl px-6 pt-14 pb-16 sm:pt-20">
+		<p class={eyebrow}>
+			<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true"></span>
+			VLSI
+		</p>
+		<h1 class="mt-3 max-w-3xl text-balance font-display text-4xl font-bold tracking-tight text-text sm:text-6xl">
+			Learn chip design, one track at a time<span class="text-coral">.</span>
+		</h1>
+		<p class="mt-5 max-w-2xl text-lg leading-relaxed text-text/80">
+			Video lessons with lecture notes, grouped into tracks you can follow from the first lesson to the
+			last. New lessons land here as they go up on YouTube.
+		</p>
+		<div class="mt-8 flex flex-wrap gap-4">
+			{
+				startLesson && (
+					<a
+						href={`/blog/${startLesson.id}`}
+						class="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-canvas shadow-lg shadow-primary/25 transition hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+					>
+						Start here
+						<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+					</a>
+				)
+			}
+			<a
+				href="#tracks"
+				class="inline-flex items-center gap-2 rounded-full border-2 border-text/20 bg-canvas/60 px-6 py-3 text-sm font-semibold text-text transition-colors hover:border-primary hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+			>
+				Browse tracks
+			</a>
+			{
+				YOUTUBE_CHANNEL_URL && (
+					<a
+						href={YOUTUBE_CHANNEL_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-semibold text-text underline decoration-coral decoration-2 underline-offset-4 hover:text-coral"
+					>
+						YouTube channel
+					</a>
+				)
+			}
+		</div>
+	</section>
+
+	<!-- Tracks -->
+	<section id="tracks" class="scroll-mt-20 bg-linear-to-br from-secondary/30 via-secondary/15 to-blush/40">
+		<div class="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+			<div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
+				<div>
+					<p class={eyebrow}>
+						<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true"></span>
+						Tracks
+					</p>
+					<h2 class="mt-3 font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">Pick a path</h2>
+				</div>
+				<p class="max-w-md text-sm text-text/70">
+					Each track is an ordered series of lessons. Planned lessons are listed too, and fill in as they're published.
+				</p>
+			</div>
+
+			{
+				tracks.length > 0 ? (
+					<ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+						{tracks.map((info, i) => (
+							<li data-reveal style={`--reveal-delay: ${(i % 3) * 100}ms`}>
+								<TrackCard info={info} />
+							</li>
+						))}
+					</ul>
+				) : (
+					<div class="relative mt-10 overflow-hidden rounded-3xl bg-primary px-6 py-14 text-center shadow-xl shadow-primary/20 sm:px-12" data-reveal>
+						<CircuitTraces class="pointer-events-none absolute -right-16 -bottom-16 w-[30rem] text-canvas/10" />
+						<p class="relative font-display text-2xl font-semibold text-canvas sm:text-3xl">The first track is on its way</p>
+						<p class="relative mx-auto mt-3 max-w-lg text-canvas/85">
+							Lessons are being recorded now. Tracks will appear here with their full lesson plan as soon as the first one goes live.
+						</p>
+						{YOUTUBE_CHANNEL_URL && (
+							<a
+								href={YOUTUBE_CHANNEL_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="relative mt-7 inline-flex rounded-full bg-canvas px-6 py-3 text-sm font-semibold text-primary shadow-lg transition hover:-translate-y-0.5 hover:bg-blush"
+							>
+								Subscribe on YouTube
+							</a>
+						)}
+					</div>
+				)
+			}
+		</div>
+	</section>
+
+	<!-- Latest lessons -->
+	{
+		latestVideos.length > 0 && (
+			<section class="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+				<div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
+					<div>
+						<p class={eyebrow}>
+							<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true" />
+							Latest
+						</p>
+						<h2 class="mt-3 font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">New lessons</h2>
+					</div>
+					<a href="/blog" class="text-sm font-semibold text-primary hover:text-coral">
+						All posts →
+					</a>
+				</div>
+				<ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{latestVideos.map((post, i) => (
+						<li data-reveal style={`--reveal-delay: ${i * 100}ms`}>
+							<PostCard post={post} />
+						</li>
+					))}
+				</ul>
+			</section>
+		)
+	}
+
+	<!-- Lecture notes -->
+	{
+		notes.length > 0 && (
+			<section class="mx-auto max-w-6xl px-6 pb-20">
+				<div class="rounded-3xl border border-text/10 bg-canvas/80 p-6 shadow-sm sm:p-8" data-reveal>
+					<p class={eyebrow}>
+						<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true" />
+						Library
+					</p>
+					<h2 class="mt-3 font-display text-3xl font-bold tracking-tight text-text">Lecture notes</h2>
+					<ul class="mt-6 divide-y divide-text/10">
+						{notes.map((post) => (
+							<li class="flex flex-wrap items-center gap-x-4 gap-y-2 py-4">
+								<div class="min-w-0 flex-1">
+									<a href={`/blog/${post.id}`} class="font-semibold text-text hover:text-primary">
+										{post.data.title}
+									</a>
+									<p class="text-xs text-text/60">
+										{formatDate(post.data.date)}
+										{post.data.lesson && ` · Lesson ${post.data.lesson}`}
+									</p>
+								</div>
+								<a
+									href={post.data.pdf}
+									download
+									class="rounded-full border-2 border-text/15 px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+								>
+									Download PDF
+								</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			</section>
+		)
+	}
+</Layout>
