@@ -1,0 +1,152 @@
+---
+import { getEntry, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import YouTube from '../../components/YouTube.astro';
+import { formatDate, getPosts, getTracks } from '../../lib/content';
+import { YOUTUBE_CHANNEL_URL } from '../../data/site';
+
+export async function getStaticPaths() {
+	const posts = await getPosts();
+	return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { title, description, date, type, tags, youtubeId, pdf, lesson, draft } = post.data;
+const { Content } = await render(post);
+
+// If this post is a lesson, find its neighbours in the track for previous/next links.
+const trackInfo = post.data.track ? (await getTracks()).find((t) => t.track.id === post.data.track!.id) : undefined;
+const track = post.data.track ? await getEntry(post.data.track) : undefined;
+const prevLesson = trackInfo && lesson ? trackInfo.lessons[lesson - 2] : undefined;
+const nextLesson = trackInfo && lesson ? trackInfo.lessons[lesson] : undefined;
+const pdfName = pdf?.split('/').pop();
+---
+
+<Layout title={`${title} - Anirban Dam`} description={description}>
+	<article class="mx-auto max-w-3xl px-6 pt-10 pb-20 sm:pt-14">
+		<nav aria-label="Breadcrumb" class="text-sm text-text/70">
+			<a href="/blog" class="font-medium text-primary hover:text-coral">Blog</a>
+			{
+				track && (
+					<>
+						<span aria-hidden="true"> / </span>
+						<a href={`/vlsi/${track.id}`} class="font-medium text-primary hover:text-coral">
+							{track.data.title}
+						</a>
+					</>
+				)
+			}
+		</nav>
+
+		<header class="mt-6">
+			<div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+				<span class:list={['rounded-full px-2.5 py-0.5', type === 'video' ? 'bg-primary text-canvas' : 'bg-blush text-primary']}>
+					{type === 'video' ? 'Video' : 'Article'}
+				</span>
+				{
+					trackInfo && lesson && (
+						<span class="rounded-full border border-secondary bg-canvas px-2.5 py-0.5 text-primary">
+							Lesson {lesson} of {trackInfo.lessons.length}
+						</span>
+					)
+				}
+				{draft && <span class="rounded-full bg-coral px-2.5 py-0.5 text-text">Draft: only visible in dev</span>}
+				<time datetime={date.toISOString()} class="font-medium text-text/60">{formatDate(date)}</time>
+			</div>
+			<h1 class="mt-4 text-balance font-display text-3xl font-bold tracking-tight text-text sm:text-5xl">{title}</h1>
+			<p class="mt-4 text-lg leading-relaxed text-text/80">{description}</p>
+		</header>
+
+		{youtubeId && <div class="mt-8"><YouTube id={youtubeId} title={title} /></div>}
+
+		{
+			pdf && (
+				<section class="mt-8 rounded-2xl border border-text/10 bg-canvas/80 p-5 shadow-sm" aria-labelledby="notes-heading">
+					<div class="flex flex-wrap items-center gap-4">
+						<span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-coral/20 text-primary" aria-hidden="true">
+							<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+								<path d="M14 3v6h6M12 18v-6M9 15l3 3 3-3" />
+							</svg>
+						</span>
+						<div class="min-w-0 flex-1">
+							<h2 id="notes-heading" class="font-display text-lg font-semibold text-text">Lecture notes</h2>
+							<p class="truncate text-sm text-text/65">{pdfName}</p>
+						</div>
+						<div class="flex gap-2">
+							<a href={pdf} target="_blank" rel="noopener" class="rounded-full border-2 border-text/15 px-4 py-2 text-sm font-semibold text-text transition-colors hover:border-primary hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+								Open
+							</a>
+							<a href={pdf} download class="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-canvas shadow-md shadow-primary/25 transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+								Download PDF
+							</a>
+						</div>
+					</div>
+					<details class="group mt-4 hidden md:block">
+						<summary class="cursor-pointer text-sm font-semibold text-primary hover:text-coral">Preview the notes here</summary>
+						<iframe src={pdf} title={`Lecture notes: ${title}`} loading="lazy" class="mt-3 h-[75vh] w-full rounded-xl border border-text/10 bg-canvas"></iframe>
+					</details>
+				</section>
+			)
+		}
+
+		<div class="prose-site mt-10">
+			<Content />
+		</div>
+
+		{
+			tags.length > 0 && (
+				<ul class="mt-10 flex flex-wrap gap-2" aria-label="Tags">
+					{tags.map((tag) => (
+						<li class="rounded-full bg-blush/70 px-3 py-1 text-xs font-semibold text-primary">#{tag}</li>
+					))}
+				</ul>
+			)
+		}
+
+		{
+			trackInfo && track && (
+				<nav class="mt-12 grid gap-4 sm:grid-cols-2" aria-label="Lesson navigation">
+					{prevLesson ? (
+						prevLesson.post ? (
+							<a href={`/blog/${prevLesson.post.id}`} class="rounded-2xl border border-text/10 bg-canvas/80 p-4 transition hover:border-secondary hover:shadow-md">
+								<span class="text-xs font-semibold text-text/60">← Lesson {prevLesson.number}</span>
+								<span class="mt-1 block font-semibold text-text">{prevLesson.title}</span>
+							</a>
+						) : (
+							<span />
+						)
+					) : (
+						<a href={`/vlsi/${track.id}`} class="rounded-2xl border border-text/10 bg-canvas/80 p-4 transition hover:border-secondary hover:shadow-md">
+							<span class="text-xs font-semibold text-text/60">← Track overview</span>
+							<span class="mt-1 block font-semibold text-text">{track.data.title}</span>
+						</a>
+					)}
+					{nextLesson &&
+						(nextLesson.post ? (
+							<a href={`/blog/${nextLesson.post.id}`} class="rounded-2xl border border-text/10 bg-canvas/80 p-4 text-right transition hover:border-secondary hover:shadow-md">
+								<span class="text-xs font-semibold text-text/60">Lesson {nextLesson.number} →</span>
+								<span class="mt-1 block font-semibold text-text">{nextLesson.title}</span>
+							</a>
+						) : (
+							<div class="rounded-2xl border border-dashed border-text/20 p-4 text-right">
+								<span class="text-xs font-semibold text-text/60">Next: Lesson {nextLesson.number} (coming soon)</span>
+								<span class="mt-1 block font-semibold text-text/60">{nextLesson.title}</span>
+							</div>
+						))}
+				</nav>
+			)
+		}
+
+		<div class="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-text/10 pt-6">
+			<a href="/blog" class="text-sm font-semibold text-primary hover:text-coral">← All posts</a>
+			{
+				YOUTUBE_CHANNEL_URL && (
+					<a href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-text underline decoration-coral decoration-2 underline-offset-4 hover:text-coral">
+						Subscribe on YouTube
+					</a>
+				)
+			}
+		</div>
+	</article>
+</Layout>

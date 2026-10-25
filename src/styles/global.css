@@ -150,3 +150,114 @@
     }
   }
 }
+
+/* Long-form text rendered from Markdown (blog posts, track pages). */
+.prose-site {
+  color: color-mix(in oklab, var(--color-text) 85%, transparent);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.prose-site > * + * {
+  margin-top: 1.15em;
+}
+
+.prose-site :where(h2, h3, h4) {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.3;
+  scroll-margin-top: 6rem;
+}
+
+.prose-site h2 {
+  margin-top: 2em;
+  font-size: 1.5rem;
+}
+
+.prose-site h3 {
+  margin-top: 1.6em;
+  font-size: 1.2rem;
+}
+
+.prose-site a {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.prose-site a:hover {
+  color: var(--color-text);
+  text-decoration-color: var(--color-coral);
+}
+
+.prose-site strong {
+  color: var(--color-text);
+}
+
+.prose-site ul {
+  list-style: disc;
+  padding-left: 1.5em;
+}
+
+.prose-site ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+}
+
+.prose-site li + li {
+  margin-top: 0.4em;
+}
+
+.prose-site li::marker {
+  color: var(--color-coral);
+}
+
+.prose-site blockquote {
+  border-left: 4px solid var(--color-coral);
+  padding-left: 1em;
+  font-style: italic;
+}
+
+.prose-site :not(pre) > code {
+  border-radius: 0.375rem;
+  background-color: var(--color-blush);
+  padding: 0.1em 0.35em;
+  font-size: 0.9em;
+}
+
+.prose-site pre {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.prose-site img {
+  border-radius: 1rem;
+}
+
+.prose-site hr {
+  border-color: color-mix(in oklab, var(--color-text) 15%, transparent);
+}
+
+.prose-site table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.prose-site :where(th, td) {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-text) 12%, transparent);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.prose-site th {
+  color: var(--color-text);
+  font-weight: 600;
+}

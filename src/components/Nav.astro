@@ -1,6 +1,12 @@
 ---
 // 'tools' marks where the Common Tools dropdown sits among the links.
-const navItems = [{ href: '/', label: 'Home' }, 'tools', { href: '/contact', label: 'Contact' }] as const;
+const navItems = [
+	{ href: '/', label: 'Home' },
+	{ href: '/vlsi', label: 'VLSI' },
+	{ href: '/blog', label: 'Blog' },
+	'tools',
+	{ href: '/contact', label: 'Contact' },
+] as const;
 // `icon` is the inner markup of a 24x24 stroke icon.
 const tools = [
 	{
@@ -17,10 +23,17 @@ const tools = [
 	},
 ];
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+// A section stays highlighted on its sub-pages too (e.g. Blog on /blog/some-post).
+const isActive = (href: string) => (href === '/' ? currentPath === '/' : currentPath === href || currentPath.startsWith(`${href}/`));
 const onToolPage = tools.some((tool) => tool.href === currentPath);
+
+const linkClass =
+	'inline-block rounded-full px-4 py-2.5 whitespace-nowrap text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
+const mobileLinkClass =
+	'flex items-center rounded-xl px-4 py-3 text-base font-medium text-text transition-colors hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 ---
 
-<header class="sticky top-0 z-40 border-b border-text/10 bg-canvas/75 backdrop-blur-md">
+<header class="sticky top-0 z-40 border-b border-text/10 bg-canvas/75 backdrop-blur-md" data-site-header>
 	<div class="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-4 sm:px-6">
 		<a
 			href="/"
@@ -32,44 +45,108 @@ const onToolPage = tools.some((tool) => tool.href === currentPath);
 			>
 				AD
 			</span>
-			<span class="hidden sm:inline">Anirban Dam</span>
+			Anirban Dam
 		</a>
 
-		<nav aria-label="Primary">
-			<ul class="flex items-center gap-0.5 sm:gap-2">
+		<!-- Desktop -->
+		<nav aria-label="Primary" class="hidden md:block">
+			<ul class="flex items-center gap-1 lg:gap-2">
 				{
 					navItems.map((item) =>
 						// Not a link: opens on hover, or by toggling the button (tap, Enter/Space).
 						item === 'tools' ? (
 							<li class="group relative" data-dropdown>
-					<button
-						type="button"
-						aria-haspopup="true"
-						aria-expanded="false"
-						aria-controls="tools-menu"
-						data-active={onToolPage ? 'true' : undefined}
-						class="peer inline-flex cursor-default items-center gap-1 rounded-full px-2.5 py-2.5 whitespace-nowrap max-[359px]:px-1.5 text-sm font-medium text-text/80 transition-colors group-hover:bg-blush/60 group-hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-canvas sm:px-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-					>
-						Common Tools
-						<svg class="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 peer-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-							<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
-						</svg>
-					</button>
-					<!-- pt-2 bridges the gap so the menu stays open while the pointer moves onto it -->
-					<div
-						id="tools-menu"
-						class="invisible absolute left-1/2 top-full z-50 w-64 sm:w-72 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100"
-					>
-						<ul class="rounded-2xl border border-text/10 bg-canvas p-2 shadow-xl shadow-primary/10">
-							{
-								tools.map((tool) => (
+								<button
+									type="button"
+									aria-haspopup="true"
+									aria-expanded="false"
+									aria-controls="tools-menu"
+									data-active={onToolPage ? 'true' : undefined}
+									class="peer inline-flex cursor-default items-center gap-1 rounded-full px-4 py-2.5 whitespace-nowrap text-sm font-medium text-text/80 transition-colors group-hover:bg-blush/60 group-hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+								>
+									Common Tools
+									<svg class="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 peer-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+										<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
+									</svg>
+								</button>
+								<!-- pt-2 bridges the gap so the menu stays open while the pointer moves onto it -->
+								<div
+									id="tools-menu"
+									class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100"
+								>
+									<ul class="rounded-2xl border border-text/10 bg-canvas p-2 shadow-xl shadow-primary/10">
+										{tools.map((tool) => (
+											<li>
+												<a
+													href={tool.href}
+													aria-current={currentPath === tool.href ? 'page' : undefined}
+													class="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-blush/60 aria-[current=page]:bg-blush focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+												>
+													<span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas" aria-hidden="true">
+														<svg
+															class="h-4 w-4"
+															viewBox="0 0 24 24"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2"
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															set:html={tool.icon}
+														/>
+													</span>
+													<span>
+														<span class="block text-sm font-semibold text-text">{tool.label}</span>
+														<span class="block text-xs text-text/70">{tool.description}</span>
+													</span>
+												</a>
+											</li>
+										))}
+									</ul>
+								</div>
+							</li>
+						) : (
+							<li>
+								<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined} class={linkClass}>
+									{item.label}
+								</a>
+							</li>
+						),
+					)
+				}
+			</ul>
+		</nav>
+
+		<!-- Mobile: menu button -->
+		<button
+			id="mobile-menu-button"
+			type="button"
+			aria-expanded="false"
+			aria-controls="mobile-menu"
+			class="group flex h-11 w-11 items-center justify-center rounded-full text-text transition-colors hover:bg-blush/60 aria-expanded:bg-primary aria-expanded:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:hidden"
+		>
+			<span class="sr-only">Menu</span>
+			<svg class="h-6 w-6 group-aria-expanded:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<path d="M4 7h16M4 12h16M4 17h16"></path>
+			</svg>
+			<svg class="hidden h-6 w-6 group-aria-expanded:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<path d="M6 6l12 12M18 6 6 18"></path>
+			</svg>
+		</button>
+	</div>
+
+	<!-- Mobile: menu panel -->
+	<nav id="mobile-menu" aria-label="Primary" hidden class="border-t border-text/10 bg-canvas md:hidden">
+		<ul class="mx-auto max-w-5xl space-y-1 px-4 py-4">
+			{
+				navItems.map((item) =>
+					item === 'tools' ? (
+						<li class="pt-2">
+							<p class="px-4 pb-1 text-xs font-semibold tracking-[0.15em] text-text/60 uppercase">Common Tools</p>
+							<ul class="space-y-1">
+								{tools.map((tool) => (
 									<li>
-										<a
-											href={tool.href}
-											aria-current={currentPath === tool.href ? 'page' : undefined}
-											class="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-blush/60 aria-[current=page]:bg-blush focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-										>
-											<span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas" aria-hidden="true">
+										<a href={tool.href} aria-current={currentPath === tool.href ? 'page' : undefined} class:list={[mobileLinkClass, 'gap-3']}>
+											<span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-canvas" aria-hidden="true">
 												<svg
 													class="h-4 w-4"
 													viewBox="0 0 24 24"
@@ -81,37 +158,27 @@ const onToolPage = tools.some((tool) => tool.href === currentPath);
 													set:html={tool.icon}
 												/>
 											</span>
-											<span>
-												<span class="block text-sm font-semibold text-text">{tool.label}</span>
-												<span class="block text-xs text-text/70">{tool.description}</span>
-											</span>
+											{tool.label}
 										</a>
 									</li>
-								))
-							}
-						</ul>
-					</div>
-				</li>
-						) : (
-							<li>
-							<a
-								href={item.href}
-								aria-current={currentPath === item.href ? 'page' : undefined}
-								class="inline-block rounded-full px-2.5 py-2.5 whitespace-nowrap max-[359px]:px-1.5 max-[359px]:px-1.5 sm:px-4 text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
-							>
+								))}
+							</ul>
+						</li>
+					) : (
+						<li>
+							<a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined} class={mobileLinkClass}>
 								{item.label}
 							</a>
 						</li>
-						),
-					)
-				}
-			</ul>
-		</nav>
-	</div>
+					),
+				)
+			}
+		</ul>
+	</nav>
 </header>
 
 <script>
-	// Hover is handled in CSS; this adds tap/keyboard toggling for touch and keyboard users.
+	// Desktop dropdown: hover is handled in CSS; this adds tap/keyboard toggling.
 	for (const dropdown of document.querySelectorAll<HTMLElement>('[data-dropdown]')) {
 		const button = dropdown.querySelector('button')!;
 		const setOpen = (open: boolean) => button.setAttribute('aria-expanded', String(open));
@@ -130,4 +197,25 @@ const onToolPage = tools.some((tool) => tool.href === currentPath);
 			if (!dropdown.contains(event.relatedTarget as Node | null)) setOpen(false);
 		});
 	}
+
+	// Mobile menu panel.
+	const header = document.querySelector<HTMLElement>('[data-site-header]')!;
+	const menuButton = document.getElementById('mobile-menu-button')!;
+	const menu = document.getElementById('mobile-menu')!;
+	const setMenu = (open: boolean) => {
+		menuButton.setAttribute('aria-expanded', String(open));
+		menu.hidden = !open;
+	};
+	menuButton.addEventListener('click', () => setMenu(menu.hidden));
+	document.addEventListener('click', (event) => {
+		if (!menu.hidden && !header.contains(event.target as Node)) setMenu(false);
+	});
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape' && !menu.hidden) {
+			setMenu(false);
+			menuButton.focus();
+		}
+	});
+	// Close if the screen grows past the mobile breakpoint while open.
+	matchMedia('(min-width: 768px)').addEventListener('change', (event) => event.matches && setMenu(false));
 </script>
