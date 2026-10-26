@@ -1,7 +1,7 @@
 ---
 title: Emulation & FPGA Prototyping
 summary: Running a chip design before the silicon exists, and what emulation teams do day to day.
-order: 3
+order: 4
 level: Advanced
 outline:
   - Why emulate?

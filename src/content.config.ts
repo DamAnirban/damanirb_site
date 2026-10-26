@@ -11,7 +11,7 @@ const tracks = defineCollection({
 		title: z.string(),
 		summary: z.string(),
 		order: z.number(), // position on the VLSI page
-		level: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional(),
+		level: z.enum(['Beginner', 'Intermediate', 'Advanced', 'Mixed']).optional(), // Mixed: lessons span several levels
 		playlist: z.url().optional(), // YouTube playlist URL
 		outline: z.array(z.string()).min(1), // planned lesson titles, in order
 		draft: z.boolean().default(false),
