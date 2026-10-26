@@ -39,7 +39,7 @@ Create `src/content/tracks/<url-name>.md`. It appears at `/vlsi/<url-name>`.
 title: Static Timing Analysis
 summary: One sentence for the track card.
 order: 2                        # position on the VLSI page
-level: Intermediate             # Beginner, Intermediate or Advanced (optional)
+level: Intermediate             # Beginner, Intermediate, Advanced or Mixed (optional)
 playlist: https://www.youtube.com/playlist?list=...   # optional
 outline:                        # every planned lesson, in order
   - What timing analysis answers

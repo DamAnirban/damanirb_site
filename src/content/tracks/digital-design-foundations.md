@@ -12,4 +12,4 @@ outline:
   - Putting it together in Verilog
 ---
 
-Start here if you are new to VLSI. Each lesson builds on the one before, and every lesson comes with lecture notes you can download.
+Each lesson builds on the one before, and every lesson comes with lecture notes you can download.

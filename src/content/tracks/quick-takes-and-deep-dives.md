@@ -2,6 +2,7 @@
 title: Quick Takes & Deep Dives
 summary: Standalone videos on the topics people search for, from short problem walkthroughs to full one-shot deep dives. Jump in anywhere.
 order: 5
+level: Mixed
 outline:
   - "D flip-flop using a 2:1 MUX"
   - "Implementing any Boolean function using a decoder"
