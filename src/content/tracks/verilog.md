@@ -1,7 +1,7 @@
 ---
 title: Verilog
 summary: Describe hardware in code, from your first module to clean, synthesizable RTL with a testbench to prove it works.
-order: 2
+order: 3
 level: Intermediate
 outline:
   - Why hardware description languages exist
