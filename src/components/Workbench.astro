@@ -13,7 +13,9 @@ const slides = await Promise.all(
 );
 ---
 
-<section class="mx-auto max-w-5xl px-6 py-20 sm:py-28" aria-labelledby="workbench-heading">
+<!-- Light like the page, with a soft tint deepening toward the bottom edge so it separates from the next section. -->
+<section class="bg-linear-to-b from-transparent from-30% to-blush/80" aria-labelledby="workbench-heading">
+	<div class="mx-auto max-w-5xl px-6 py-20 sm:py-28">
 	<div data-reveal>
 		<p class="flex items-center gap-3 font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase">
 			<span class="h-0.5 w-8 rounded-full bg-coral" aria-hidden="true"></span>
@@ -78,6 +80,7 @@ const slides = await Promise.all(
 			))
 		}
 	</ul>
+	</div>
 </section>
 
 <!-- Full-screen viewer -->
@@ -85,7 +88,7 @@ const slides = await Promise.all(
 	id="workbench-viewer"
 	aria-label="Photo viewer"
 	data-slides={JSON.stringify(slides)}
-	class="m-0 h-full max-h-none w-full max-w-none bg-text/95 p-0 text-canvas backdrop:bg-text/80 open:flex open:flex-col"
+	class="m-0 h-full max-h-none w-full max-w-none touch-pan-y touch-pinch-zoom overscroll-contain bg-text p-0 text-canvas backdrop:bg-text/80 open:flex open:flex-col"
 >
 	<div class="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
 		<p class="text-sm text-canvas/70"><span data-counter></span></p>
@@ -104,7 +107,7 @@ const slides = await Promise.all(
 			type="button"
 			data-prev
 			aria-label="Previous photo"
-			class="absolute left-2 hidden h-12 w-12 items-center justify-center rounded-full bg-canvas/10 transition-colors hover:bg-canvas/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral sm:left-4 sm:flex"
+			class="absolute left-2 flex h-10 w-10 items-center justify-center rounded-full bg-text/60 backdrop-blur transition-colors hover:bg-canvas/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral sm:left-4 sm:h-12 sm:w-12 sm:bg-canvas/10 sm:backdrop-blur-none"
 		>
 			<svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.83 10l3.94 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02z" clip-rule="evenodd"></path></svg>
 		</button>
@@ -112,7 +115,7 @@ const slides = await Promise.all(
 			type="button"
 			data-next
 			aria-label="Next photo"
-			class="absolute right-2 hidden h-12 w-12 items-center justify-center rounded-full bg-canvas/10 transition-colors hover:bg-canvas/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral sm:right-4 sm:flex"
+			class="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-text/60 backdrop-blur transition-colors hover:bg-canvas/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-coral sm:right-4 sm:h-12 sm:w-12 sm:bg-canvas/10 sm:backdrop-blur-none"
 		>
 			<svg class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.17 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02z" clip-rule="evenodd"></path></svg>
 		</button>
@@ -120,7 +123,7 @@ const slides = await Promise.all(
 	<div class="px-6 pt-3 pb-6 text-center" aria-live="polite">
 		<p data-title class="font-display text-lg font-semibold"></p>
 		<p data-caption class="mx-auto mt-1 max-w-xl text-sm text-canvas/75"></p>
-		<p class="mt-2 text-xs text-canvas/50 sm:hidden">Swipe to see more</p>
+		<p class="mt-2 text-xs text-canvas/50 sm:hidden">Swipe or use the arrows</p>
 	</div>
 </dialog>
 
@@ -156,6 +159,8 @@ const slides = await Promise.all(
 			show(Number(tile.dataset.slide));
 			viewer.showModal();
 			document.documentElement.style.overflow = 'hidden';
+			// Stop horizontal swipes from triggering the browser's swipe-to-go-back while the viewer is open.
+			document.documentElement.style.overscrollBehaviorX = 'none';
 		});
 	}
 
@@ -168,22 +173,41 @@ const slides = await Promise.all(
 	});
 	// Clicking the dark area around the photo closes the viewer.
 	viewer.querySelector('[data-stage]')!.addEventListener('click', (event) => {
-		if (event.target === event.currentTarget) viewer.close();
+		if (event.target === event.currentTarget && !justSwiped) viewer.close();
 	});
 	viewer.addEventListener('close', () => {
 		document.documentElement.style.overflow = '';
+		document.documentElement.style.overscrollBehaviorX = '';
 		opener?.focus();
 	});
 
-	// Swipe left/right on touch screens.
-	let startX: number | null = null;
-	viewer.addEventListener('pointerdown', (event) => {
-		if (event.pointerType !== 'mouse') startX = event.clientX;
-	});
-	viewer.addEventListener('pointerup', (event) => {
-		if (startX === null) return;
-		const dx = event.clientX - startX;
-		startX = null;
-		if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
-	});
+	// Swipe left/right on touch screens. Touch events are used rather than pointer events because
+	// mobile browsers cancel the pointer stream as soon as a finger starts moving (they treat it as a scroll).
+	const stage = viewer.querySelector<HTMLElement>('[data-stage]')!;
+	let touchStart: { x: number; y: number } | null = null;
+	let justSwiped = false;
+	stage.addEventListener(
+		'touchstart',
+		(event) => {
+			const touch = event.touches[0];
+			touchStart = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY } : null; // ignore pinch-zoom
+		},
+		{ passive: true },
+	);
+	stage.addEventListener(
+		'touchend',
+		(event) => {
+			if (!touchStart) return;
+			const touch = event.changedTouches[0];
+			const dx = touch.clientX - touchStart.x;
+			const dy = touch.clientY - touchStart.y;
+			touchStart = null;
+			if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+				justSwiped = true;
+				show(index + (dx < 0 ? 1 : -1));
+				setTimeout(() => (justSwiped = false), 400);
+			}
+		},
+		{ passive: true },
+	);
 </script>
