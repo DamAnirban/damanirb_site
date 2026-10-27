@@ -23,7 +23,7 @@ const filters = [
 		<div class="mt-3 flex flex-wrap items-end justify-between gap-6">
 			<div>
 				<h1 class="font-display text-4xl font-bold tracking-tight text-text sm:text-6xl">Notes &amp; videos</h1>
-				<p class="mt-4 max-w-xl text-lg leading-relaxed text-text/80">
+				<p class="mt-4 max-w-xl text-lg leading-relaxed text-text/90">
 					Articles, and VLSI video lessons with lecture notes you can download.
 				</p>
 			</div>
@@ -36,7 +36,7 @@ const filters = [
 								type="button"
 								data-filter={filter.id}
 								aria-pressed={filter.id === 'all' ? 'true' : 'false'}
-								class="rounded-full px-4 py-2 text-sm font-semibold text-text/75 transition-colors hover:text-primary aria-pressed:bg-primary aria-pressed:text-canvas aria-pressed:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+								class="rounded-full px-4 py-2 text-sm font-semibold text-text/85 transition-colors hover:text-primary aria-pressed:bg-primary aria-pressed:text-canvas aria-pressed:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 							>
 								{filter.label} <span class="opacity-70">{filter.count}</span>
 							</button>
@@ -56,9 +56,9 @@ const filters = [
 					))}
 				</ul>
 			) : (
-				<div class="mt-12 rounded-3xl border border-dashed border-text/20 bg-canvas/60 px-6 py-16 text-center">
+				<div class="mt-12 rounded-3xl border border-dashed border-text/20 bg-surface px-6 py-16 text-center">
 					<p class="font-display text-2xl font-semibold text-text">First posts are on their way</p>
-					<p class="mx-auto mt-3 max-w-md text-text/70">
+					<p class="mx-auto mt-3 max-w-md text-text/85">
 						Articles and VLSI lessons will show up here as they're published.
 					</p>
 				</div>

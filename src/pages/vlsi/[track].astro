@@ -17,7 +17,7 @@ const nextUp = lessons.find((lesson) => lesson.post);
 
 <Layout title={`${track.data.title} - VLSI - Anirban Dam`} description={track.data.summary}>
 	<section class="mx-auto max-w-3xl px-6 pt-10 pb-20 sm:pt-14">
-		<nav aria-label="Breadcrumb" class="text-sm text-text/70">
+		<nav aria-label="Breadcrumb" class="text-sm text-text/85">
 			<a href="/vlsi" class="font-medium text-primary hover:text-coral">VLSI</a>
 			<span aria-hidden="true"> / </span>
 			<span>Track</span>
@@ -25,14 +25,14 @@ const nextUp = lessons.find((lesson) => lesson.post);
 
 		<div class="mt-6 flex flex-wrap items-center gap-2 text-xs font-semibold">
 			<span class="rounded-full bg-blush px-2.5 py-0.5 text-primary">{STATUS_LABELS[status]}</span>
-			{track.data.level && <span class="rounded-full bg-secondary/25 px-2.5 py-0.5 text-text/80">{track.data.level}</span>}
+			{track.data.level && <span class="rounded-full bg-secondary/25 px-2.5 py-0.5 text-text/90">{track.data.level}</span>}
 			{track.data.draft && <span class="rounded-full bg-coral px-2.5 py-0.5 text-text">Draft: only visible in dev</span>}
 		</div>
 		<h1 class="mt-4 text-balance font-display text-4xl font-bold tracking-tight text-text sm:text-5xl">{track.data.title}</h1>
-		<p class="mt-4 text-lg leading-relaxed text-text/80">{track.data.summary}</p>
+		<p class="mt-4 text-lg leading-relaxed text-text/90">{track.data.summary}</p>
 
-		<div class="mt-8 rounded-2xl border border-text/10 bg-canvas/80 p-5 shadow-sm">
-			<div class="flex items-baseline justify-between text-sm font-semibold text-text/75">
+		<div class="mt-8 rounded-2xl border border-text/10 bg-surface p-5 shadow-sm">
+			<div class="flex items-baseline justify-between text-sm font-semibold text-text/85">
 				<span>{published} of {lessons.length} lessons published</span>
 				<span>{percent}%</span>
 			</div>
@@ -77,14 +77,14 @@ const nextUp = lessons.find((lesson) => lesson.post);
 						<li>
 							<a
 								href={`/blog/${lesson.post.id}`}
-								class="group flex items-center gap-4 rounded-2xl border border-text/10 bg-canvas/80 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-secondary hover:shadow-md"
+								class="group flex items-center gap-4 rounded-2xl border border-text/10 bg-surface p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-secondary hover:shadow-md"
 							>
 								<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-display font-bold text-canvas">
 									{lesson.number}
 								</span>
 								<span class="min-w-0 flex-1">
 									<span class="block font-semibold text-text group-hover:text-primary">{lesson.title}</span>
-									<span class="block text-xs text-text/60">
+									<span class="block text-xs text-text/75">
 										{formatDate(lesson.post.data.date)}
 										{lesson.post.data.pdf && ' · PDF notes'}
 									</span>
@@ -94,12 +94,12 @@ const nextUp = lessons.find((lesson) => lesson.post);
 						</li>
 					) : (
 						<li class="flex items-center gap-4 rounded-2xl border border-dashed border-text/20 p-4">
-							<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-text/15 font-display font-bold text-text/50">
+							<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-text/15 font-display font-bold text-text/75">
 								{lesson.number}
 							</span>
 							<span class="min-w-0 flex-1">
-								<span class="block font-semibold text-text/60">{lesson.title}</span>
-								<span class="block text-xs text-text/60">Coming soon</span>
+								<span class="block font-semibold text-text/75">{lesson.title}</span>
+								<span class="block text-xs text-text/75">Coming soon</span>
 							</span>
 						</li>
 					),

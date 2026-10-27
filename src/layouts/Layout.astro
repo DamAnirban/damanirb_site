@@ -22,7 +22,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="theme-color" content="#FAEFED" />
+		<meta name="theme-color" content="#FDF7F5" />
 		<link rel="canonical" href={canonicalURL} />
 		<link rel="preload" href={interLatinUrl} as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href={spaceGroteskLatinUrl} as="font" type="font/woff2" crossorigin />
@@ -41,7 +41,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 	</head>
-	<body class="bg-canvas text-text antialiased">
+	<body class="bg-canvas text-text">
 		<a
 			href="#main"
 			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-5 focus:py-2.5 focus:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
@@ -53,8 +53,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 			<!-- Page-top atmosphere shared by every page -->
 			<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[42rem]">
 				<div class="bg-dots mask-fade-b absolute inset-0 opacity-70"></div>
-				<div class="absolute -top-32 -right-24 h-[28rem] w-[28rem] rounded-full bg-blush blur-3xl"></div>
-				<div class="absolute top-40 -left-40 h-[24rem] w-[24rem] rounded-full bg-secondary/30 blur-3xl"></div>
+				<div class="absolute -top-32 -right-24 h-[28rem] w-[28rem] rounded-full bg-blush/55 blur-3xl"></div>
+				<div class="absolute top-40 -left-40 h-[24rem] w-[24rem] rounded-full bg-secondary/15 blur-3xl"></div>
 			</div>
 			<slot />
 		</main>
