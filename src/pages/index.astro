@@ -49,7 +49,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 	<!-- Hero -->
 	<section class="mx-auto flex max-w-5xl flex-col-reverse items-center gap-12 px-6 pt-12 pb-20 sm:pt-20 sm:pb-28 lg:flex-row lg:gap-16">
 		<div class="flex-1 text-center lg:text-left">
-			<p class="inline-flex items-center gap-2 rounded-full border border-secondary/60 bg-canvas/70 py-1.5 pr-4 pl-2 text-sm font-medium text-text/80 shadow-sm backdrop-blur">
+			<p class="inline-flex items-center gap-2 rounded-full border border-secondary/60 bg-surface py-1.5 pr-4 pl-2 text-sm font-medium text-text/90 shadow-sm">
 				<span class="relative flex h-2.5 w-2.5" aria-hidden="true">
 					<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-coral opacity-60"></span>
 					<span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-coral"></span>
@@ -68,7 +68,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 					))
 				}
 			</ul>
-			<p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-text/80 lg:mx-0">
+			<p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-text/90 lg:mx-0">
 				A VLSI &amp; Emulation Engineer by profession and robotics hobbyist by passion. I design
 				hardware flows, automate chip design methodology, and share what I learn across code,
 				circuits, and content.
@@ -83,7 +83,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 				</a>
 				<a
 					href="/contact"
-					class="group inline-flex items-center gap-2 rounded-full border-2 border-text/20 bg-canvas/60 px-6 py-3 text-sm font-semibold text-text backdrop-blur transition-colors hover:border-primary hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+					class="group inline-flex items-center gap-2 rounded-full border-2 border-text/20 bg-surface px-6 py-3 text-sm font-semibold text-text transition-colors hover:border-primary hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 				>
 					Get in Touch
 					<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
@@ -113,13 +113,13 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 			/>
 			<div
 				aria-hidden="true"
-				class="animate-float absolute -top-4 -left-8 flex items-center gap-2 rounded-2xl border border-text/10 bg-canvas/90 px-4 py-2.5 text-sm font-semibold text-text shadow-lg backdrop-blur sm:-left-10"
+				class="animate-float absolute -top-4 -left-8 flex items-center gap-2 rounded-2xl border border-text/10 bg-surface px-4 py-2.5 text-sm font-semibold text-text shadow-lg sm:-left-10"
 			>
 				<span class="text-lg">🔬</span> Silicon by day
 			</div>
 			<div
 				aria-hidden="true"
-				class="animate-float absolute -right-2 -bottom-2 flex items-center gap-2 rounded-2xl border border-text/10 bg-canvas/90 px-4 py-2.5 text-sm font-semibold text-text shadow-lg backdrop-blur [animation-delay:-3.5s] sm:-right-8"
+				class="animate-float absolute -right-2 -bottom-2 flex items-center gap-2 rounded-2xl border border-text/10 bg-surface px-4 py-2.5 text-sm font-semibold text-text shadow-lg [animation-delay:-3.5s] sm:-right-8"
 			>
 				<span class="text-lg">🤖</span> Robots by night
 			</div>
@@ -138,7 +138,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 				<h2 class="mt-3 text-balance font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
 					Building with Purpose
 				</h2>
-				<div class="mt-8 grid gap-x-10 gap-y-5 text-lg leading-relaxed text-text/80 lg:grid-cols-2">
+				<div class="mt-8 grid gap-x-10 gap-y-5 text-lg leading-relaxed text-text/90 lg:grid-cols-2">
 					<div class="space-y-5">
 						<p>
 							Most breakthroughs don’t happen in perfect tutorials, they happen in messy
@@ -156,7 +156,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 							Whether I am automating chip design flows, building robotics projects, or deep
 							diving into tools - I try to follow this:
 						</p>
-						<p class="rounded-2xl border-l-4 border-coral bg-canvas/70 px-5 py-4 font-display text-xl font-semibold text-primary shadow-sm">
+						<p class="rounded-2xl border-l-4 border-coral bg-surface px-5 py-4 font-display text-xl font-semibold text-primary shadow-sm">
 							Learn deeply, simplify clearly and share generously.
 						</p>
 						<p>
@@ -201,7 +201,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 			{
 				steps.map((step, i) => (
 					<li data-reveal style={`--reveal-delay: ${(i % 3) * 100}ms`}>
-						<div class="group relative h-full overflow-hidden rounded-2xl border border-text/10 bg-canvas/80 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-xl hover:shadow-primary/10">
+						<div class="group relative h-full overflow-hidden rounded-2xl border border-text/10 bg-surface p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-xl hover:shadow-primary/10">
 							<span
 								class="pointer-events-none absolute -top-4 right-3 font-display text-8xl font-bold text-secondary/25 transition-colors duration-300 select-none group-hover:text-coral/25"
 								aria-hidden="true"
@@ -215,7 +215,7 @@ const focusAreas = ['VLSI', 'Emulation', 'Robotics'];
 								{step.emoji}
 							</span>
 							<h3 class="relative mt-5 font-display text-lg font-semibold text-text">{step.title}</h3>
-							<p class="relative mt-2 text-sm leading-relaxed text-text/70">{step.body}</p>
+							<p class="relative mt-2 text-sm leading-relaxed text-text/85">{step.body}</p>
 							<span
 								class="absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-linear-to-r from-primary via-secondary to-coral transition-transform duration-500 group-hover:scale-x-100"
 								aria-hidden="true"

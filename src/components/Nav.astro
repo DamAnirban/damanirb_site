@@ -28,7 +28,7 @@ const isActive = (href: string) => (href === '/' ? currentPath === '/' : current
 const onToolPage = tools.some((tool) => tool.href === currentPath);
 
 const linkClass =
-	'inline-block rounded-full px-4 py-2.5 whitespace-nowrap text-sm font-medium text-text/80 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
+	'inline-block rounded-full px-4 py-2.5 whitespace-nowrap text-sm font-medium text-text/90 transition-colors hover:text-primary hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas aria-[current=page]:hover:bg-primary aria-[current=page]:hover:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas';
 const mobileLinkClass =
 	'flex items-center rounded-xl px-4 py-3 text-base font-medium text-text transition-colors hover:bg-blush/60 aria-[current=page]:bg-primary aria-[current=page]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 ---
@@ -62,7 +62,7 @@ const mobileLinkClass =
 									aria-expanded="false"
 									aria-controls="tools-menu"
 									data-active={onToolPage ? 'true' : undefined}
-									class="peer inline-flex cursor-default items-center gap-1 rounded-full px-4 py-2.5 whitespace-nowrap text-sm font-medium text-text/80 transition-colors group-hover:bg-blush/60 group-hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+									class="peer inline-flex cursor-default items-center gap-1 rounded-full px-4 py-2.5 whitespace-nowrap text-sm font-medium text-text/90 transition-colors group-hover:bg-blush/60 group-hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
 								>
 									Common Tools
 									<svg class="h-4 w-4 transition-transform duration-200 group-hover:rotate-180 peer-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -74,7 +74,7 @@ const mobileLinkClass =
 									id="tools-menu"
 									class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 translate-y-1 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 peer-aria-expanded:visible peer-aria-expanded:translate-y-0 peer-aria-expanded:opacity-100"
 								>
-									<ul class="rounded-2xl border border-text/10 bg-canvas p-2 shadow-xl shadow-primary/10">
+									<ul class="rounded-2xl border border-text/10 bg-surface p-2 shadow-xl shadow-primary/10">
 										{tools.map((tool) => (
 											<li>
 												<a
@@ -96,7 +96,7 @@ const mobileLinkClass =
 													</span>
 													<span>
 														<span class="block text-sm font-semibold text-text">{tool.label}</span>
-														<span class="block text-xs text-text/70">{tool.description}</span>
+														<span class="block text-xs text-text/85">{tool.description}</span>
 													</span>
 												</a>
 											</li>
@@ -154,7 +154,7 @@ const mobileLinkClass =
 								]}
 							>
 								Common Tools
-								<svg class="h-5 w-5 text-text/60 transition-transform duration-200 group-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+								<svg class="h-5 w-5 text-text/75 transition-transform duration-200 group-aria-expanded:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
 									<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
 								</svg>
 							</button>
@@ -164,7 +164,7 @@ const mobileLinkClass =
 										<a
 											href={tool.href}
 											aria-current={currentPath === tool.href ? 'page' : undefined}
-											class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-text/85 transition-colors hover:bg-canvas aria-[current=page]:bg-primary aria-[current=page]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+											class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-text/90 transition-colors hover:bg-canvas aria-[current=page]:bg-primary aria-[current=page]:text-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
 										>
 											<svg
 												class="h-4 w-4 shrink-0 opacity-70"

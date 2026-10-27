@@ -8,18 +8,22 @@
   --font-body: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
   /* Brand palette - role-based, contrast-checked against each background it
-     actually sits on (see conversation for the full matrix):
-       text/canvas 11.7:1, text/blush 9.8:1, primary/canvas 6.3:1,
-       canvas/primary 6.3:1, text/coral 4.7:1 - all pass AA.
-     Secondary (1.9:1) and coral (2.5:1) fall under 3:1 against canvas, so
+     actually sits on:
+       text/canvas 15.7:1, text/surface 16.6:1, text/blush 12.3:1,
+       primary/canvas 6.7:1, canvas/primary 6.7:1, text/coral 5.9:1 - all pass AA.
+     Secondary (2.0:1) and coral (2.7:1) fall under 3:1 against canvas, so
      they're used decoratively only (borders, rings, icons) - never as text
-     on a light fill. */
-  --color-canvas: #faefed; /* Background - warm ivory, dominant fill */
+     on a light fill.
+     Muted text uses text/90, /85 or /75 only (11.8, 10.0 and 7.1:1 on canvas);
+     lower opacities wash the copy out. Cards and panels sit on solid `surface`
+     rather than translucent canvas + blur, which keeps the page crisp. */
+  --color-canvas: #fdf7f5; /* Background - warm ivory, dominant fill */
+  --color-surface: #ffffff; /* Cards, panels and menus that sit on the canvas */
   --color-primary: #006078; /* Primary - deep teal, CTAs & brand accents */
   --color-secondary: #82bac4; /* Secondary - muted cyan, borders & accents */
   --color-blush: #ffd4d1; /* Soft accent - card & panel fills */
   --color-coral: #e37c78; /* Highlight - eyebrows, hover, sparing use */
-  --color-text: #19343a; /* Text/Ink - deep charcoal, all copy */
+  --color-text: #0e2126; /* Text/Ink - deep teal-black, all copy */
 
   --animate-float: float 7s ease-in-out infinite;
   --animate-spin-slow: spin 40s linear infinite;
@@ -153,7 +157,7 @@
 
 /* Long-form text rendered from Markdown (blog posts, track pages). */
 .prose-site {
-  color: color-mix(in oklab, var(--color-text) 85%, transparent);
+  color: color-mix(in oklab, var(--color-text) 90%, transparent);
   font-size: 1.0625rem;
   line-height: 1.75;
 }
